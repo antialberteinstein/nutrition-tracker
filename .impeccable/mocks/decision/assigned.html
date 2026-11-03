@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Hoá đơn quán — Hôm nay</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F5F6F4;--ink:#1C1E22;--ink2:#5B5F66;--carbon:#27348B;--lien:#F1DDE3;--stamp:#C2362B;--rule:#C9CCD1;
+--kcal:#27348B;--dam:#2E7D5B;--na:#9A6A00;--duong:#8E3B8A}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:390px;height:844px;overflow:hidden;background:var(--paper);font-family:Roboto,system-ui,sans-serif;color:var(--ink);position:relative}
+.num{font-family:"Roboto Mono",monospace;font-variant-numeric:tabular-nums}
+.sb{height:28px;background:var(--carbon)}
+.bar{background:var(--carbon);color:#fff;padding:6px 8px 14px 16px;display:flex;align-items:center;gap:8px}
+.bar h1{font-size:22px;font-weight:500;flex:1}
+.bar .d{font-size:14px;opacity:.85;margin-top:2px}
+.ib{width:40px;height:40px;border-radius:20px;display:grid;place-items:center;font-size:22px;color:#fff}
+.ib.off{opacity:.35}
+.tot{margin:0 12px;background:#fff;padding:18px 16px 14px;border-bottom:1px solid var(--rule);box-shadow:0 1px 0 var(--rule)}
+.lab{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:500}
+.big{display:flex;align-items:baseline;gap:8px;margin-top:4px}
+.big b{font-size:52px;font-weight:700;color:var(--kcal);letter-spacing:-.02em}
+.big span{font-size:20px;color:var(--ink2)}
+.cap{position:relative;height:10px;margin:12px 0 4px;border-bottom:2px dashed var(--rule)}
+.cap i{position:absolute;left:0;top:0;bottom:-2px;width:80%;background:var(--kcal)}
+.capl{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2)}
+.row{display:flex;align-items:baseline;gap:6px;margin-top:12px;font-size:15px}
+.dot{width:8px;height:8px;border-radius:4px;flex:none;transform:translateY(-1px)}
+.lead{flex:1;border-bottom:1.5px dotted var(--rule);transform:translateY(-4px)}
+.v{font-size:15px}.v em{font-style:normal;color:var(--ink2)}
+.over{color:var(--stamp);font-weight:700}
+.stamp{display:inline-flex;align-items:center;gap:3px;border:1.5px solid var(--stamp);color:var(--stamp);font-size:11px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.04em;margin-left:6px;transform:translateY(-1px)}
+.dbl{border-top:3px double var(--ink);margin:14px 0 8px}
+.left{display:flex;justify-content:space-between;align-items:baseline}
+.left .lab{color:var(--ink)}
+.left b{font-size:20px}
+.list{margin:18px 12px 0}
+.th{display:grid;grid-template-columns:1fr 52px 40px 52px 40px;gap:4px;font-size:11px;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;padding:0 4px 6px;border-bottom:1px solid var(--ink)}
+.th span,.tr span{text-align:right}
+.tr{display:grid;grid-template-columns:1fr 52px 40px 52px 40px;gap:4px;align-items:baseline;padding:13px 4px;border-bottom:1px solid var(--rule);font-size:15px}
+.tr span{font-size:13px;color:var(--ink2)}.tr span.k{font-size:15px;color:var(--ink);font-weight:500}
+.tr span.over{color:var(--stamp)}
+.fab{position:absolute;right:16px;bottom:96px;width:56px;height:56px;border-radius:16px;background:var(--lien);color:var(--carbon);display:grid;place-items:center;font-size:30px;box-shadow:0 3px 6px rgba(0,0,0,.18)}
+.nav{position:absolute;left:0;right:0;bottom:0;height:80px;background:#ECEEF2;display:flex;justify-content:space-around;align-items:center;padding-bottom:6px}
+.nav div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:500;color:var(--ink2)}
+.nav i{width:64px;height:32px;border-radius:16px;display:grid;place-items:center;font-style:normal;font-size:18px}
+.nav .on{color:var(--ink)}.nav .on i{background:var(--lien);color:var(--carbon)}
+</style></head><body>
+<div class="sb"></div>
+<header class="bar"><div class="ib">‹</div><div style="flex:1"><h1>Hôm nay</h1><div class="d">Thứ Tư · 04/11/2026</div></div><div class="ib off">›</div></header>
+<section class="tot">
+  <div class="lab">Calo · kcal</div>
+  <div class="big num"><b>1.644</b><span>/ 2.056</span></div>
+  <div class="cap"><i></i></div>
+  <div class="capl"><span>đã nạp 80%</span><span class="num">còn 412</span></div>
+  <div class="row"><span class="dot" style="background:var(--dam)"></span>Đạm · g<span class="lead"></span><span class="v num">78 <em>/ 112</em></span></div>
+  <div class="row"><span class="dot" style="background:var(--na)"></span>Natri · mg<span class="lead"></span><span class="v num"><span class="over">2.350</span> <em>/ 2.000</em></span><span class="stamp">▲ VƯỢT 350</span></div>
+  <div class="row"><span class="dot" style="background:var(--duong)"></span>Đường · g<span class="lead"></span><span class="v num">21 <em>/ 26</em></span></div>
+  <div class="dbl"></div>
+  <div class="left"><span class="lab">Còn lại</span><b class="num" style="color:var(--kcal)">412 kcal</b></div>
+</section>
+<section class="list">
+  <div class="th"><div>4 món</div><span>kcal</span><span>đạm</span><span>natri</span><span>đường</span></div>
+  <div class="tr"><div>Bánh mì trứng</div><span class="k num">380</span><span class="num">14</span><span class="num">620</span><span class="num">2</span></div>
+  <div class="tr"><div>Bún nạm</div><span class="k num">450</span><span class="num">25</span><span class="num">1.200</span><span class="num">1</span></div>
+  <div class="tr"><div>Cà phê sữa đá</div><span class="k num">120</span><span class="num">2</span><span class="num">50</span><span class="num">18</span></div>
+  <div class="tr"><div>Cơm gà xối mỡ</div><span class="k num">694</span><span class="num">37</span><span class="num">480</span><span class="num">0</span></div>
+</section>
+<div class="fab">+</div>
+<nav class="nav"><div class="on"><i>▤</i>Hôm nay</div><div><i>▥</i>Biểu đồ</div><div><i>⚙</i>Cài đặt</div></nav>
+</body></html>

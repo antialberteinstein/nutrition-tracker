@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>App tiêu dùng ấm — Hôm nay</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F2EEE9;--card:#FFFFFF;--act:#0F6E63;--ink:#2A2623;--ink2:#6E6660;--warn:#B3261E;--track:#E9E3DC}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:390px;height:844px;overflow:hidden;background:var(--ground);font-family:"Nunito Sans",system-ui,sans-serif;color:var(--ink);position:relative;font-variant-numeric:tabular-nums}
+.sb{height:28px}
+.bar{display:flex;align-items:center;padding:4px 8px 12px 20px}
+.bar div{flex:1}.bar h1{font-size:24px;font-weight:800}.bar p{font-size:14px;color:var(--ink2)}
+.ib{width:44px;height:44px;border-radius:22px;display:grid;place-items:center;font-size:22px}
+.ib.off{opacity:.3}
+.card{background:var(--card);border-radius:24px;margin:0 16px 12px;padding:20px}
+.big .l{font-size:14px;color:var(--ink2);font-weight:600}
+.big .n{font-size:44px;font-weight:800;margin-top:2px}.big .n span{font-size:18px;color:var(--ink2);font-weight:600}
+.track{height:10px;border-radius:5px;background:var(--track);margin-top:12px;overflow:hidden}
+.track i{display:block;height:100%;width:80%;background:var(--ink)}
+.big .r{font-size:14px;margin-top:8px;color:var(--ink2)}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:0 16px 12px}
+.mini{background:var(--card);border-radius:20px;padding:14px 12px}
+.mini .l{font-size:13px;color:var(--ink2);font-weight:600}.mini .n{font-size:20px;font-weight:800;margin-top:4px}
+.mini .s{font-size:12px;color:var(--ink2)}
+.mini.over{box-shadow:inset 0 0 0 2px var(--warn)}.mini.over .n{color:var(--warn)}.mini.over .s{color:var(--warn);font-weight:600}
+.meals .h{font-size:16px;font-weight:800;margin-bottom:6px}
+.m{display:flex;justify-content:space-between;padding:12px 0;border-top:1px solid var(--track);font-size:15px}
+.m b{font-weight:800}
+.fab{position:absolute;right:20px;bottom:100px;height:56px;padding:0 20px;border-radius:28px;background:var(--act);color:#fff;display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px;box-shadow:0 4px 12px rgba(15,110,99,.35)}
+.nav{position:absolute;left:0;right:0;bottom:0;height:80px;background:var(--card);display:flex;justify-content:space-around;align-items:center;border-radius:24px 24px 0 0}
+.nav div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--ink2)}
+.nav i{font-style:normal;font-size:20px}.nav .on{color:var(--act)}
+</style></head><body>
+<div class="sb"></div>
+<header class="bar"><div class="ib">‹</div><div><h1>Hôm nay</h1><p>Thứ Tư, 04/11/2026</p></div><div class="ib off">›</div></header>
+<section class="card big"><div class="l">Calo đã nạp</div><div class="n">1.644 <span>/ 2.056 kcal</span></div><div class="track"><i></i></div><div class="r">Bạn còn 412 kcal cho hôm nay</div></section>
+<section class="grid">
+  <div class="mini"><div class="l">Đạm</div><div class="n">78 g</div><div class="s">/ 112 g</div></div>
+  <div class="mini over"><div class="l">Natri</div><div class="n">2.350</div><div class="s">⚠ Vượt 350 mg</div></div>
+  <div class="mini"><div class="l">Đường</div><div class="n">21 g</div><div class="s">/ 26 g</div></div>
+</section>
+<section class="card meals"><div class="h">Đã ăn hôm nay</div>
+  <div class="m"><span>Bánh mì trứng</span><b>380</b></div>
+  <div class="m"><span>Bún nạm</span><b>450</b></div>
+  <div class="m"><span>Cà phê sữa đá</span><b>120</b></div>
+  <div class="m"><span>Cơm gà xối mỡ</span><b>694</b></div>
+</section>
+<div class="fab">＋ Ghi món</div>
+<nav class="nav"><div class="on"><i>●</i>Hôm nay</div><div><i>▥</i>Biểu đồ</div><div><i>⚙</i>Cài đặt</div></nav>
+</body></html>
