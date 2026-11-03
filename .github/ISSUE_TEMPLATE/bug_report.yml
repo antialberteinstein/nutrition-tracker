@@ -1,0 +1,34 @@
+name: Báo lỗi
+description: Báo hành vi không đúng trong Nutrition Tracker.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: Không gửi mật khẩu, token, khóa bí mật hoặc dữ liệu cá nhân. Che thông tin riêng tư trong ảnh và log.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Mô tả lỗi và kết quả mong đợi
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Các bước tái hiện
+      placeholder: "1. Mở app…"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Thiết bị/trình duyệt, hệ điều hành và phiên bản app
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Thông báo lỗi, mã hỗ trợ, ảnh hoặc log đã che dữ liệu riêng tư
+  - type: textarea
+    id: frequency
+    attributes:
+      label: Tần suất và điều kiện mạng

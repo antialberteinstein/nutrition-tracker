@@ -1,0 +1,6 @@
+{
+  "udid": "REPLACE_WITH_DEVICE_UDID",
+  "appiumServer": "http://127.0.0.1:4723",
+  "apkPath": "build/app-debug.apk",
+  "appPackage": "io.github.antialberteinstein.nutritiontracker"
+}

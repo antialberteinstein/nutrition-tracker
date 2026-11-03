@@ -1,0 +1,48 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # Expo SDK pins these together; upgrade them with `npx expo install --fix` / an SDK bump PR.
+      expo-sdk:
+        patterns:
+          - "expo"
+          - "expo-*"
+          - "@expo/*"
+          - "react"
+          - "react-dom"
+          - "react-native"
+          - "react-native-*"
+          - "@react-native/*"
+          - "jest-expo"
+          - "@types/react"
+    ignore:
+      # Major versions of SDK-pinned packages only move with an Expo SDK upgrade.
+      - dependency-name: "expo*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@expo/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-native*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@react-native/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "jest-expo"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: uv
+    directory: /e2e/mobile-appium
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3

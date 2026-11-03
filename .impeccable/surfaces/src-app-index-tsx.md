@@ -1,8 +1,8 @@
 ---
 version: 1
-slug: "app-tabs-index-tsx"
-primary_target: "app/(tabs)/index.tsx"
-related_targets: ["components/AddMealSheet.tsx"]
+slug: "src-app-index-tsx"
+primary_target: "src/app/index.tsx"
+related_targets: ["src/components/add-meal-sheet.tsx"]
 ---
 
 # Surface brief: Tab Hôm nay + bottom sheet ghi món

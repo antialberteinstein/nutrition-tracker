@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+reports/
+build/
+.expo/
+android/
+ios/
+supabase/.temp/
+e2e/mobile-appium/.venv/
+package-lock.json
+.impeccable/
+# Docs are authored and reviewed as written; Prettier formats code, YAML and JSON only.
+*.md

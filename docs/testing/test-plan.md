@@ -34,7 +34,7 @@
     "appPackage": "<package Android>"
   }
   ```
-- **Kết nối Metro:** máy test và máy tính cùng mạng Wi-Fi (`run-metro.sh` chạy Metro ở chế độ LAN). Nếu cắm USB, `run-test.sh` tự làm `adb reverse` cho cổng Metro. Lệnh `adb` chỉ nằm **trong script**.
+- **Kết nối Metro:** máy test cắm USB. `run-metro.sh` chạy Metro ở cổng 8081; `run-test.sh` tự làm `adb reverse tcp:8081 tcp:8081` để APK debug tải được JS bundle. Lệnh `adb` chỉ nằm **trong script**.
 
 ## 4. Cách chạy
 ```bash

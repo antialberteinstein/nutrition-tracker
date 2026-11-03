@@ -1,0 +1,56 @@
+# CI (ADR-012). No secrets needed: public env vars use fake values, the database job uses local Supabase.
+# E2E Appium does not run here (needs a real device); results go into the PR.
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  workflow_call: # lets a release workflow reuse the full CI
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  CI: true
+  EXPO_PUBLIC_SUPABASE_URL: https://ci.example.invalid
+  EXPO_PUBLIC_SUPABASE_ANON_KEY: ci-fake-anon-key
+jobs:
+  quality:
+    name: Quality, tests and bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run test:coverage
+      - run: npm run build
+      - name: Dependency audit (advisory)
+        continue-on-error: true
+        run: npm audit --omit=dev
+
+  database:
+    name: Database (pgTAP on local Supabase)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 3.0.0 # keep in sync with the `supabase` devDependency
+      - name: Start Postgres and apply migrations
+        run: supabase db start
+      - name: Run pgTAP suites (supabase/tests)
+        run: supabase test db

@@ -1,0 +1,80 @@
+# Nhật ký prompt — Nutrition Tracker
+
+Mọi yêu cầu của người dùng đã dựng nên dự án này, theo thứ tự thời gian. Mỗi yêu cầu dẫn tới thay đổi trong repo có một mục, được ghi trong cùng PR với thay đổi đó. Chỉ thêm mục mới, không sửa hay xoá mục cũ (yêu cầu sau thay đổi yêu cầu trước thì ghi mục mới và trỏ về mục cũ).
+
+Quy tắc:
+- **Yêu cầu:** rút gọn, giữ ý định sản phẩm và các ràng buộc người dùng nêu; bỏ phần trao đổi qua lại.
+- **Quyết định:** những gì người dùng đã chốt khi agent hỏi lại (phương án được chọn, phần bị loại).
+- Không ghi secret, token, mật khẩu, URL môi trường thật, email hay dữ liệu cá nhân.
+- Prompt giao việc cho một giai đoạn lớn vẫn nằm ở `prompts/NN-slug.txt`; mục nhật ký chỉ trỏ tới file đó.
+
+Mẫu một mục:
+
+```markdown
+## YYYY-MM-DD · <lệnh hoặc ngữ cảnh, ví dụ `/kessie-skills:proj build #12`>
+- **Yêu cầu:** <ý định của người dùng, 1–3 câu>
+- **Quyết định:** <đã chốt gì; "—" nếu không có>
+- **Kết quả:** <issue/PR, file prompt giai đoạn nếu có>
+```
+
+---
+
+## 2026-11-04 · `/kessie-skills:proj kickoff <ý tưởng>`
+- **Yêu cầu:** App mobile theo dõi dinh dưỡng hằng ngày, dùng React Native + Expo và Supabase.
+  - Ghi món ăn kèm calo, đạm, natri, đường; ngày ghi mặc định là hôm nay, chỉ được chọn ngày quá khứ.
+  - Gợi ý lại món đã nhập (ví dụ "bún nạm") và tự điền dinh dưỡng của lần nhập trước.
+  - Lần đầu nhập cân nặng, chiều cao; mục tiêu ngày gợi ý theo BMI, giới tính và mong muốn (tăng, giảm, giữ cân), người dùng tự đặt lại được.
+  - Tài khoản role user, mỗi user có dữ liệu riêng. Push nhắc ghi chép (Firebase), giờ nhắc chỉnh trong Cài đặt.
+  - Biểu đồ đường hoặc cột có đường BMR, an toàn (BMR + 300), mục tiêu, trần 4000; đường, natri, đạm có ngưỡng theo WHO.
+  - Workout bật/tắt trong Cài đặt: activity, sub-activity, lịch lặp, chặn trùng lịch (ghi trong `docs/ADR.md`, kèm hướng dẫn trong CLAUDE.md), nhắc trước 30 phút, calo tính vào biểu đồ.
+
+  Remote: `antialberteinstein/nutrition-tracker`.
+- **Quyết định:**
+  - **Phạm vi:** Workout tách sang 0.2.0.
+  - **Hồ sơ và mục tiêu:**
+    - Onboarding hỏi thêm năm sinh và mức vận động; BMR theo Mifflin-St Jeor;
+    - điều chỉnh calo −500 / 0 / +300, kèm cảnh báo khi ngược mong muốn;
+    - khi bật Workout, TDEE dùng hệ số 1.2.
+  - **Ngưỡng:**
+    - đạm 0.8 / 1.6 / 2.2 g/kg;
+    - natri nhập theo mg: 500 / 1500 / 2000;
+    - đường 5% / 10% calo;
+    - phân loại BMI theo chuẩn châu Á – Thái Bình Dương.
+  - **Workout:** calo chỉ tính khi đánh dấu "Đã tập"; lịch gồm giờ bắt đầu + thời lượng; thêm sub đầu tiên thì chuyển lịch sang sub đó.
+  - **Tài khoản và phát hành:** chỉ email + mật khẩu; cần mạng; 0.1.0 chỉ phát hành Android APK.
+  - **Ngoài phạm vi:** cơ sở dữ liệu món ăn, admin, Apple Health / Google Fit, đa ngôn ngữ.
+  - **Loại dự án:** A.
+- **Kết quả:** `docs/IdeaBrief.md`, `docs/RequirementsOutline.md`, `docs/modules/*` (đã duyệt), `docs/ADR.md` (13 ADR) — commit `docs: kickoff phases 0–2`.
+
+## 2026-11-04 · Góp ý ADR-008 (chặn trùng lịch)
+- **Yêu cầu:** Cặp có lịch hằng ngày chỉ chặn theo giờ; cặp tuần–tuần xét thứ trùng và giờ trùng; không cho lặp hằng tháng (ghi rõ đánh đổi); dùng bitmask để kiểm nhanh.
+- **Quyết định:** Bỏ lặp hằng tháng. Điều kiện trùng là `(maskA & maskB) != 0` và giờ giao nhau; ngày trùng đầu tiên tính bằng phép xoay bit. Bỏ WO-07, WO-08, WO-09; thêm WO-30 đến WO-35.
+- **Kết quả:** `docs/ADR.md` (ADR-008), `docs/modules/Workout.md`, `docs/RequirementsOutline.md`.
+
+## 2026-11-04 · Góp ý ADR-012 và ADR-006, duyệt các ADR còn lại
+- **Yêu cầu:**
+  - E2E bằng Appium + Python (uv) trong `e2e/mobile-appium`, UDID máy test lưu ở `config.json` (gitignore).
+  - Thêm `scripts/build-debug-apk.sh`, `run-metro.sh`, `run-test.sh`.
+  - Chụp màn hình khi lỗi vào `reports/` (gitignore, mỗi lần chạy ghi đè).
+  - Tài liệu `docs/testing/test-plan.md` và `test-cases.md`.
+  - CLAUDE.md: sửa dựa trên `reports/`; báo người dùng khi thiết bị chưa kết nối; không tự chạy máy ảo hay `adb`.
+  - Thông báo không cần đúng giờ khi chưa dùng FCM; khi dùng FCM thì trễ tối đa 5 phút.
+- **Quyết định:** Appium thay cho Maestro; `run-test.sh` thoát mã 3 khi chưa có thiết bị; nới các AC về thời gian thông báo (REM-02, REM-05, WO-26, WO-28). Cả 13 ADR đã chốt.
+- **Kết quả:** `docs/ADR.md`, `docs/testing/*`, spec cập nhật.
+
+## 2026-11-04 · `/impeccable:impeccable init` và `shape today-screen`
+- **Yêu cầu:** Ghi bối cảnh sản phẩm, rồi dựng brief thiết kế cho tab Hôm nay.
+- **Quyết định:**
+  - Nền tảng: Android, Material 3. Tên "Nutrition Tracker"; giọng văn trung tính, xưng "bạn".
+  - Bố cục: tiêu điểm là calo, 3 chất gọn bên dưới; form ghi món dạng bottom sheet; vượt ngưỡng hiện bằng màu + icon + chữ.
+  - Hướng hình ảnh "Vở ô ly" (chọn thay cho lượt bốc thăm "Hoá đơn quán"). Dynamic Color tắt; không có Hoàn tác sau khi lưu.
+- **Kết quả:** `PRODUCT.md`, `.impeccable/surfaces/` (brief tab Hôm nay).
+
+## 2026-11-04 · `/kessie-skills:proj kickoff` (giai đoạn 3: nền repo)
+- **Yêu cầu:** Dựng nền repo theo kế hoạch đã duyệt: git, Expo, scaffold, Supabase, lint/test, E2E Appium, CI. Dừng trước khi push.
+- **Quyết định:**
+  - License MIT.
+  - Expo SDK 58 (route trong `src/app/`), package `io.github.antialberteinstein.nutritiontracker`.
+  - `eslint.config.js` do `expo lint` sinh; Prettier dùng cấu hình mặc định (hook config-protection chặn tạo file cấu hình riêng).
+  - Supabase CLI là devDependency (`npx supabase`).
+- **Kết quả:** commit `chore: scaffold repository foundation`.
