@@ -62,9 +62,15 @@ def by_text(driver, pattern):
 
 
 @pytest.fixture(autouse=True)
-def back_to_login(driver):
-    """If a test fails midway, sign out so later files (test_smoke) start on Đăng nhập."""
+def back_to_login(driver, request):
+    """If a test fails midway, sign out so later files (test_smoke) start on Đăng nhập.
+
+    Passing tests hand their state to the next test in this file, so only failures clean up.
+    """
     yield
+    rep = getattr(request.node, "rep_call", None)
+    if rep is None or not rep.failed:
+        return
     driver.implicitly_wait(0)
     try:
         for _ in range(4):
