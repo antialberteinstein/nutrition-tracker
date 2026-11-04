@@ -19,6 +19,7 @@ export type ColorRole =
   | "outline"
   | "outlineVariant"
   | "error"
+  | "warning"
   | "margin";
 
 /** Text roles: must stay ≥ 4.5:1 on background and surfaceContainer. */
@@ -27,6 +28,7 @@ export const TEXT_ROLES = [
   "onSurfaceVariant",
   "primary",
   "error",
+  "warning",
 ] as const;
 
 export const palettes: Record<Scheme, Record<ColorRole, string>> = {
@@ -43,6 +45,8 @@ export const palettes: Record<Scheme, Record<ColorRole, string>> = {
     outline: "#7A7392",
     outlineVariant: "#B9B3E6",
     error: "#B3261E",
+    // Non-blocking goal warnings W1–W6 (Goals.md §2): amber ink, always with an icon.
+    warning: "#7A5200",
     margin: "#D9473F",
   },
   // The same page under a desk lamp: deep ink ground, light violet ink.
@@ -58,6 +62,7 @@ export const palettes: Record<Scheme, Record<ColorRole, string>> = {
     outline: "#8E87A6",
     outlineVariant: "#3A3452",
     error: "#FFB4AB",
+    warning: "#F2C462",
     margin: "#FF8A80",
   },
 };
