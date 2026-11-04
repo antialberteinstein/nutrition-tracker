@@ -128,6 +128,14 @@ Mẫu một mục:
   - CI thêm bước `supabase db reset` để nạp seed; có test pgTAP kiểm tra seed.
 - **Kết quả:** PR `feat/8-app-foundation`.
 
+## 2026-11-04 · `/kessie-skills:proj build #7 -> #15` — #9 Schema hồ sơ
+- **Yêu cầu:** Issue #9: tạo bảng `profiles`, `goals`, `user_settings` kèm RLS và test hai tài khoản.
+- **Quyết định:**
+  - `user_id` mặc định là `auth.uid()`; RLS chỉ có select/insert/update cho chủ sở hữu, không có policy delete (dữ liệu chỉ bị xoá theo cascade khi xoá tài khoản, #21).
+  - Tuổi 13–100 kiểm bằng trigger, vì phụ thuộc năm hiện tại.
+  - Giờ nhắc phải là bội số của 5 phút (check constraint).
+- **Kết quả:** PR `feat/9-profile-schema`.
+
 ## 2026-11-04 · `/kessie-skills:proj build #7 -> #15` — #10 Logic dinh dưỡng
 - **Yêu cầu:** Issue #10: module thuần tính BMI, BMR, TDEE, mục tiêu, ngưỡng và cảnh báo W1–W6, kèm unit test theo các ví dụ trong spec.
 - **Quyết định:**
