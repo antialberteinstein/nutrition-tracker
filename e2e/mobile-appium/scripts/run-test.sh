@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Run the Appium E2E suite on a real Android device (ADR-012, docs/testing/test-plan.md).
-# Usage: scripts/run-test.sh [pytest args…]
+# Usage: e2e/mobile-appium/scripts/run-test.sh [pytest args…]
 # Exit codes: 0 pass · 1 test failures · 2 missing config/tools/APK · 3 device not connected.
 # Never starts an emulator. adb is only used here (read-only device check + port reverse for Metro).
 set -uo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 E2E="$ROOT/e2e/mobile-appium"
 CONFIG="$E2E/config.json"
 REPORTS="$ROOT/reports"
@@ -33,7 +33,7 @@ fi
 rm -rf "$REPORTS"
 mkdir -p "$REPORTS/screenshots" "$REPORTS/page-source"
 
-# Let the USB-connected device reach Metro on the host (scripts/run-metro.sh).
+# Let the USB-connected device reach Metro on the host (e2e/mobile-appium/scripts/run-metro.sh).
 adb -s "$UDID" reverse tcp:8081 tcp:8081 >/dev/null 2>&1 || echo "[run-test] Cảnh báo: không đặt được adb reverse cho Metro." >&2
 
 APPIUM_PID=""

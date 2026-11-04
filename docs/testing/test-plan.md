@@ -39,9 +39,9 @@
 
 ## 4. Cách chạy
 ```bash
-scripts/build-debug-apk.sh   # 1. build APK debug → build/app-debug.apk
-scripts/run-metro.sh         # 2. chạy Metro (để chạy riêng ở một terminal)
-scripts/run-test.sh          # 3. chạy toàn bộ E2E; có thể truyền tham số của pytest, ví dụ -k meal
+scripts/build-debug-apk.sh               # 1. build APK debug → build/app-debug.apk
+e2e/mobile-appium/scripts/run-metro.sh   # 2. chạy Metro (để chạy riêng ở một terminal)
+e2e/mobile-appium/scripts/run-test.sh    # 3. chạy toàn bộ E2E; có thể truyền tham số của pytest, ví dụ -k meal
 ```
 
 Mã thoát của `run-test.sh`:
@@ -68,7 +68,7 @@ reports/
 Khi gửi ảnh chụp vào issue hoặc PR, kiểm tra trước để không lộ email hay dữ liệu thật. Dữ liệu test chỉ là tài khoản giả.
 
 ## 6. Quy tắc cho agent
-- Không tự chạy máy ảo hay lệnh `adb`. Agent chỉ chạy `scripts/run-test.sh`, và chỉ khi người dùng yêu cầu.
+- Không tự chạy máy ảo hay lệnh `adb`. Agent chỉ chạy `e2e/mobile-appium/scripts/run-test.sh`, và chỉ khi người dùng yêu cầu.
 - Gặp mã thoát `3`: báo người dùng rằng thiết bị chưa kết nối, rồi dừng.
 - Test lỗi: đọc theo thứ tự `reports/junit.xml` → `screenshots/` và `page-source/` của test lỗi → `appium.log`. Sửa code hoặc selector, rồi chạy lại.
 - Không sửa test cho "xanh" bằng cách nới điều kiện, trừ khi AC trong spec đã đổi.

@@ -1,7 +1,7 @@
 [project]
 name = "nutrition-tracker-e2e"
 version = "0.1.0"
-description = "Appium (UiAutomator2) E2E tests for the Nutrition Tracker Android app. Run via scripts/run-test.sh."
+description = "Appium (UiAutomator2) E2E tests for the Nutrition Tracker Android app. Run via e2e/mobile-appium/scripts/run-test.sh."
 requires-python = ">=3.12"
 dependencies = [
     "appium-python-client>=6.1.4",

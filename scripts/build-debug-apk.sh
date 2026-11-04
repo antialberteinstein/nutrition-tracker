@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Build the Android debug APK used by the Appium E2E suite (ADR-012).
-# Output: build/app-debug.apk. The debug build loads JS from Metro (scripts/run-metro.sh).
+# Output: build/app-debug.apk. The debug build loads JS from Metro (e2e/mobile-appium/scripts/run-metro.sh).
 # Does not start emulators and does not talk to any device.
 set -euo pipefail
 

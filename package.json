@@ -61,7 +61,7 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:db": "supabase test db",
-    "test:e2e": "bash scripts/run-test.sh",
+    "test:e2e": "bash e2e/mobile-appium/scripts/run-test.sh",
     "build": "expo export --platform android --output-dir dist",
     "build:apk": "bash scripts/build-debug-apk.sh"
   },

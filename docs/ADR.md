@@ -23,8 +23,9 @@
 | ADR-009 | Biểu đồ: `victory-native` (Skia) | Chấp nhận | 2026-11-04 |
 | ADR-010 | State và form: TanStack Query, react-hook-form + zod | Chấp nhận | 2026-11-04 |
 | ADR-011 | Môi trường và migration: Supabase local + 1 cloud, `supabase db push` thủ công | Chấp nhận | 2026-11-04 |
-| ADR-012 | Kiểm thử: Jest, pgTAP, Appium (Python/uv) trên thiết bị thật | Chấp nhận | 2026-11-04 |
+| ADR-012 | Kiểm thử: Jest, pgTAP, Appium (Python/uv) trên thiết bị thật | Chấp nhận; phần vị trí script bị thay thế bởi ADR-014 | 2026-11-04 |
 | ADR-013 | Phát hành: EAS Build APK, GitHub Release + SHA-256, không OTA | Chấp nhận | 2026-11-04 |
+| ADR-014 | Script E2E nằm trong `e2e/mobile-appium/scripts/` (thay một phần ADR-012) | Chấp nhận | 2026-11-05 |
 
 ---
 
@@ -317,7 +318,7 @@ conflict(A, B) =
 
 ## ADR-012. Kiểm thử
 
-- Trạng thái: **Chấp nhận** (có bổ sung của chủ dự án: E2E bằng Appium + Python/uv) · Ngày: 2026-11-04
+- Trạng thái: **Chấp nhận** (có bổ sung của chủ dự án: E2E bằng Appium + Python/uv); **phần vị trí `run-metro.sh` và `run-test.sh` bị thay thế bởi ADR-014** · Ngày: 2026-11-04
 
 | Lớp | Công cụ | Chạy ở đâu | Phủ |
 |---|---|---|---|
@@ -390,3 +391,29 @@ reports/                      # KHÔNG commit (.gitignore); mỗi lần chạy G
 - iOS: chưa phát hành, chỉ chạy dev build.
 
 **Hệ quả.** Gói miễn phí của EAS giới hạn số lượt build mỗi tháng (kiểm tra con số hiện hành trước khi phát hành); có thể build local bằng `eas build --local` nếu hết lượt. **Xem lại khi** đưa lên Google Play hoặc phát hành iOS.
+
+---
+
+## ADR-014. Script E2E nằm trong `e2e/mobile-appium/scripts/`
+
+- Trạng thái: **Chấp nhận** · Thay thế một phần ADR-012 (cây thư mục `scripts/` và đường dẫn `scripts/run-test.sh`) · Ngày: 2026-11-05 · Người quyết định: chủ dự án ([#37](https://github.com/antialberteinstein/nutrition-tracker/issues/37))
+
+**Bối cảnh.** ADR-012 đặt cả ba script (`build-debug-apk.sh`, `run-metro.sh`, `run-test.sh`) ở `scripts/` tại gốc repo. Chủ dự án muốn gom những gì thuộc E2E mobile về một thư mục.
+
+**Phương án.**
+- Giữ nguyên như ADR-012.
+- Chuyển cả ba script vào `e2e/mobile-appium/`.
+- Chỉ chuyển hai script dành riêng cho E2E; `build-debug-apk.sh` ở lại vì `npm run build:apk` dùng chung, không riêng E2E.
+
+**Quyết định.** Phương án thứ ba:
+```
+e2e/mobile-appium/scripts/
+  run-metro.sh                # chạy Metro của Expo cho bản debug
+  run-test.sh                 # chạy E2E: kiểm tra config và thiết bị → xoá reports/ cũ → pytest
+scripts/
+  build-debug-apk.sh          # build APK debug
+```
+- `npm run test:e2e` gọi `e2e/mobile-appium/scripts/run-test.sh`. Script vẫn chạy được từ bất kỳ thư mục nào, `reports/` vẫn nằm ở gốc repo.
+- Mã thoát (0/1/2/3) và quy tắc cho agent của ADR-012 giữ nguyên; chỉ đổi đường dẫn: agent chỉ chạy `e2e/mobile-appium/scripts/run-test.sh`, và chỉ khi người dùng yêu cầu.
+
+**Hệ quả.** Đường dẫn cũ trong `prompts/*.txt` và các mục cũ của `prompts/LOG.md` là lịch sử, không sửa. **Xem lại khi** có thêm bộ E2E thứ hai (ví dụ iOS) cần dùng chung script.
