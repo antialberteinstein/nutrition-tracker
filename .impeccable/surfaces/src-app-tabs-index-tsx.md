@@ -1,7 +1,7 @@
 ---
 version: 1
-slug: "src-app-index-tsx"
-primary_target: "src/app/index.tsx"
+slug: "src-app-tabs-index-tsx"
+primary_target: "src/app/(tabs)/index.tsx"
 related_targets: ["src/components/add-meal-sheet.tsx"]
 ---
 

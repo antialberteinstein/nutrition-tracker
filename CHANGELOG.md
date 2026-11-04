@@ -7,6 +7,7 @@ Mọi thay đổi đáng chú ý của Nutrition Tracker được ghi tại đâ
 ## [Unreleased]
 
 ### Thêm
+- Tài khoản: đăng ký, xác nhận email qua deep link, đăng nhập, quên và đặt lại mật khẩu, đăng xuất; màn hình chuyển theo trạng thái phiên và hồ sơ ([#12](https://github.com/antialberteinstein/nutrition-tracker/issues/12)).
 - Giao diện "Vở ô ly" trên Material 3: bảng màu sáng/tối riêng (tắt Dynamic Color), màu cố định cho từng chất, thang chữ, cột lề đỏ, icon tab Hôm nay · Biểu đồ · Cài đặt ([#11](https://github.com/antialberteinstein/nutrition-tracker/issues/11)).
 
 - Dữ liệu ghi món: lưu món đã ăn và món đã lưu trong một giao dịch, gửi lại không ghi trùng; gợi ý món không phân biệt dấu ("bun nam" khớp "Bún nạm"), tối đa 5 gợi ý ([#15](https://github.com/antialberteinstein/nutrition-tracker/issues/15)).

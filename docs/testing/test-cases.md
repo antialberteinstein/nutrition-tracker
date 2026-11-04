@@ -11,7 +11,7 @@
 ### 0.1.0
 | Mã | AC | Tiền điều kiện | Bước chính | Kết quả mong đợi |
 |---|---|---|---|---|
-| TC-E2E-00 | — (smoke) | APK debug đã cài, Metro đang chạy | Mở app | Thấy tab Hôm nay (`testID` `screen-today`). Có từ khung repo; kiểm tra cấu hình E2E chứ không kiểm tra tính năng |
+| TC-E2E-00 | — (smoke) | APK debug đã cài, Metro đang chạy | Mở app (mới cài, chưa có phiên) | Thấy màn Đăng nhập (`testID` `screen-login`). Kiểm tra cấu hình E2E chứ không kiểm tra tính năng (đổi từ `screen-today` ở #12, khi có màn đăng nhập) |
 | TC-E2E-01 | ACC-01 | Chưa đăng nhập | Đăng ký bằng email mới, mật khẩu hợp lệ | Màn hình "Kiểm tra email"; không vào được tab nào |
 | TC-E2E-02 | ACC-02 | Chưa đăng nhập | Đăng ký với email đã tồn tại / mật khẩu 7 ký tự / hai ô mật khẩu khác nhau | Lỗi hiện dưới đúng trường; dữ liệu đã nhập được giữ |
 | TC-E2E-03 | ACC-03 | Có tài khoản A | Đăng nhập sai mật khẩu | "Email hoặc mật khẩu không đúng" |
