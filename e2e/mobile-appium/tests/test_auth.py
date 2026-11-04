@@ -24,10 +24,12 @@ def type_into(driver, test_id, text):
 
 
 def go_to_login(driver):
-    """From any auth screen, return to Đăng nhập."""
+    """From any auth screen, return to Đăng nhập. Never presses Back once the app has left the screen."""
+    package = driver.capabilities.get("appPackage")
     for _ in range(3):
         if driver.find_elements(AppiumBy.ID, "screen-login"):
             return
+        assert driver.current_package == package, f"App left the screen (on screen: {driver.current_package})"
         driver.back()
     assert by_id(driver, "screen-login").is_displayed()
 

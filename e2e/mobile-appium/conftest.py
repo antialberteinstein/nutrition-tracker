@@ -2,7 +2,9 @@
 
 - Reads the device config from config.json (gitignored; copy config.example.json).
 - Creates one UiAutomator2 session per test session.
-- On a failed test, saves a screenshot and the UI page source into reports/.
+- Before every test, brings the app under test to the foreground and fails fast if it is not there,
+  so a test never runs against another app.
+- On a failed test, saves a screenshot, the UI page source and the app's logcat into reports/.
 """
 
 from __future__ import annotations
@@ -59,6 +61,26 @@ def driver(config: dict):
     session.quit()
 
 
+@pytest.fixture(autouse=True)
+def app_in_foreground(request, config: dict):
+    """Each test starts with the app under test on screen; otherwise it fails with what is on screen."""
+    if "driver" not in request.fixturenames:
+        yield
+        return
+    session = request.getfixturevalue("driver")
+    package = config["appPackage"]
+    if session.current_package != package:
+        session.activate_app(package)
+    current = session.current_package
+    if current != package:
+        pytest.fail(f"App {package} is not in the foreground (on screen: {current}).")
+    yield
+
+
+# Logcat tags worth keeping: JS console/errors, native crashes, Expo modules. Other apps' lines are dropped.
+_LOGCAT_KEEP = re.compile(r"ReactNativeJS|ReactNative|AndroidRuntime|Expo|Hermes|FATAL|nutritiontracker")
+
+
 def _safe_name(nodeid: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]+", "_", nodeid).strip("_")
 
@@ -77,10 +99,14 @@ def pytest_runtest_makereport(item, call):
     name = _safe_name(item.nodeid)
     shots = REPORTS_DIR / "screenshots"
     sources = REPORTS_DIR / "page-source"
-    shots.mkdir(parents=True, exist_ok=True)
-    sources.mkdir(parents=True, exist_ok=True)
+    logcat = REPORTS_DIR / "logcat"
+    for folder in (shots, sources, logcat):
+        folder.mkdir(parents=True, exist_ok=True)
     try:
         session.get_screenshot_as_file(str(shots / f"{name}.png"))
         (sources / f"{name}.xml").write_text(session.page_source, encoding="utf-8")
+        lines = [e.get("message", "") for e in session.get_log("logcat")]
+        kept = [line for line in lines if _LOGCAT_KEEP.search(line)]
+        (logcat / f"{name}.txt").write_text("\n".join(kept), encoding="utf-8")
     except Exception as exc:  # the report must still be written if the session died
         print(f"[e2e] could not capture failure artifacts for {name}: {exc}")
