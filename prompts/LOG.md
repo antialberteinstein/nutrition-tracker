@@ -83,3 +83,7 @@ Mẫu một mục:
 - **Yêu cầu:** Lên kế hoạch milestone 0.1.0 từ các AC đã duyệt.
 - **Quyết định:** Duyệt 17 issue theo thứ tự nền → lõi → giao diện → tích hợp → kiểm tra trên thiết bị → phát hành. Luồng mỏng đi trước: tài khoản → onboarding → ghi món → Hôm nay. Viết 2 prompt giai đoạn. Milestone 0.2.0 (Workout) để plan sau.
 - **Kết quả:** milestone `0.1.0`, issue #7–#23; `prompts/01-foundation.txt`, `prompts/02-meal-log.txt`.
+## 2026-11-04 · Xác nhận sau giai đoạn 3
+- **Yêu cầu:** Push 2 commit đầu lên GitHub; bật bảo vệ `main` khi CI xanh; thêm plugin chính chủ của Expo vào bảng "Skill bổ trợ".
+- **Quyết định:** Thêm `expo@claude-plugins-official` vào bảng (chỉ gợi ý lệnh cài, không tự cài). Bảo vệ `main`: bắt buộc PR và hai check CI, cấm force-push, không bắt buộc reviewer.
+- **Kết quả:** PR `docs/claude-expo-skill`.
