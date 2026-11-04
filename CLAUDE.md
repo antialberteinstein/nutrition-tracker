@@ -40,7 +40,7 @@ Mọi quyết định kỹ thuật nằm trong **`docs/ADR.md`**, một file duy
 
 ## Bố cục
 
-- `src/app/`: route (Expo Router). `src/components/`: UI. `src/constants/`: theme. Sẽ có `src/domain/` (logic thuần) và `src/schemas/` (zod).
+- `src/app/`: route (Expo Router): `(auth)/` khi chưa đăng nhập, `onboarding` khi chưa có hồ sơ, `(tabs)/` khi đã có hồ sơ, `auth/callback` nhận deep link. `src/features/<tính năng>/`: logic gọi Supabase, schema zod, provider. `src/domain/`: logic thuần. `src/components/`: UI dùng chung. `src/constants/`: theme.
 - `supabase/`: `config.toml`, `migrations/`, `tests/` (pgTAP).
 - `e2e/mobile-appium/`: Appium + pytest (uv). `scripts/`: build APK, Metro, chạy E2E.
 - `docs/`: spec (`RequirementsOutline.md`, `modules/`), `ADR.md`, `testing/`. Thiết kế: `PRODUCT.md`, `.impeccable/surfaces/`. Nhật ký prompt: `prompts/LOG.md`.
@@ -90,7 +90,8 @@ npx expo install <pkg>   # luôn dùng thay cho npm install để có phiên b�
 ## Điểm dễ hỏng
 
 - **Expo đổi API mỗi SDK.** Trước khi dùng API của Expo hoặc RN, đọc tài liệu đúng phiên bản (`https://docs.expo.dev/versions/v58.0.0/`, `https://docs.expo.dev/llms.txt`), đừng dựa vào trí nhớ.
-- Testing Library v14: `render` là async, phải viết `await render(...)`.
+- Testing Library v14: `render` **và** `fireEvent` đều là async, phải viết `await render(...)`, `await fireEvent.press(...)`; quên `await` sẽ gây lỗi "overlapping act() calls" và làm hỏng test chạy sau.
+- **Deep link xác nhận và đặt lại mật khẩu:** `nutritiontracker://auth/callback?code=…&next=…` (Supabase PKCE, `flowType: "pkce"`). Link chỉ dùng được trên chính máy đã yêu cầu, vì code verifier nằm trong bộ nhớ của máy đó. Supabase local bật `enable_confirmations` và cho phép redirect `nutritiontracker://**`; project cloud phải cấu hình giống vậy.
 - `android/` và `ios/` do `expo prebuild` sinh ra (đã gitignore). Không sửa tay; cấu hình native nằm trong `app.config.ts`.
 - **Các hành vi cố ý, không phải lỗi:**
   - thông báo đến trễ (ADR-006);

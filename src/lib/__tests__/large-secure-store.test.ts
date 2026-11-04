@@ -4,7 +4,9 @@ import * as SecureStore from "expo-secure-store";
 
 import { LargeSecureStore } from "@/lib/large-secure-store";
 
+// jest.mock factories cannot use import; require is the documented mock pattern here.
 jest.mock("@react-native-async-storage/async-storage", () =>
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require("@react-native-async-storage/async-storage/jest/async-storage-mock"),
 );
 jest.mock("react-native-get-random-values", () => ({}));

@@ -154,3 +154,13 @@ Mẫu một mục:
   - Icon dùng Material Symbols (`menu_book`, `bar_chart`, `settings`) và SF Symbols tương ứng; dấu "!" ở lề dùng `expo-symbols`, không dùng ký tự Unicode.
   - Test tự động kiểm độ tương phản WCAG của bảng màu.
 - **Kết quả:** PR `feat/11-notebook-theme`.
+
+## 2026-11-04 · `tiếp tục` (`/kessie-skills:proj build #7 -> #15`) — #12 Tài khoản
+- **Yêu cầu:** Tiếp tục các issue còn lại, bắt đầu từ #12: đăng ký, xác nhận email, đăng nhập, quên mật khẩu, đăng xuất, chuyển màn hình theo trạng thái phiên.
+- **Quyết định:**
+  - Supabase PKCE với deep link `nutritiontracker://auth/callback?code=…&next=home|reset-password`.
+  - `Stack.Protected`: không có phiên → `(auth)`; có phiên nhưng chưa có hồ sơ → `onboarding` (màn tạm, #13 sẽ làm thật); có hồ sơ → `(tabs)`.
+  - Đăng ký với email đã tồn tại thì báo trên trường email (ACC-02). Quên mật khẩu luôn hiện cùng một thông báo (ACC-09).
+  - Supabase local bật xác nhận email, mật khẩu tối thiểu 8 ký tự.
+  - Testing Library v14: `fireEvent` cũng là async (đã ghi vào CLAUDE.md).
+- **Kết quả:** PR `feat/12-auth`.

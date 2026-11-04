@@ -5,10 +5,17 @@ import { z } from "zod";
 import { supabase } from "@/lib/supabase";
 
 // ------------------------------------------------------------------ schemas (Account.md §4)
-const email = z.string().trim().min(1, "Nhập email").email("Email không hợp lệ");
+const email = z
+  .string()
+  .trim()
+  .min(1, "Nhập email")
+  .email("Email không hợp lệ");
 const password = z.string().min(8, "Mật khẩu cần ít nhất 8 ký tự");
 
-export const signInSchema = z.object({ email, password: z.string().min(1, "Nhập mật khẩu") });
+export const signInSchema = z.object({
+  email,
+  password: z.string().min(1, "Nhập mật khẩu"),
+});
 export const signUpSchema = z
   .object({ email, password, confirmPassword: z.string() })
   .refine((v) => v.password === v.confirmPassword, {
@@ -37,25 +44,41 @@ export type AuthFailure = {
   needsConfirmation?: boolean;
 };
 
-const NETWORK_MESSAGE = "Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.";
+const NETWORK_MESSAGE =
+  "Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.";
 
 /** Maps Supabase Auth errors to Vietnamese messages without revealing whether an email exists. */
-export function mapAuthError(error: Pick<AuthError, "code" | "message" | "status"> | null): AuthFailure {
+export function mapAuthError(
+  error: Pick<AuthError, "code" | "message" | "status"> | null,
+): AuthFailure {
   switch (error?.code) {
     case "invalid_credentials":
       return { field: "form", message: "Email hoặc mật khẩu không đúng" };
     case "email_not_confirmed":
-      return { field: "form", message: "Email chưa được xác nhận", needsConfirmation: true };
+      return {
+        field: "form",
+        message: "Email chưa được xác nhận",
+        needsConfirmation: true,
+      };
     case "user_already_exists":
     case "email_exists":
       return { field: "email", message: "Email này đã được đăng ký" };
     case "weak_password":
-      return { field: "password", message: "Mật khẩu quá yếu, thử mật khẩu khác" };
+      return {
+        field: "password",
+        message: "Mật khẩu quá yếu, thử mật khẩu khác",
+      };
     case "over_email_send_rate_limit":
     case "over_request_rate_limit":
-      return { field: "form", message: "Bạn thao tác quá nhanh, đợi một lát rồi thử lại" };
+      return {
+        field: "form",
+        message: "Bạn thao tác quá nhanh, đợi một lát rồi thử lại",
+      };
     case "same_password":
-      return { field: "password", message: "Mật khẩu mới phải khác mật khẩu cũ" };
+      return {
+        field: "password",
+        message: "Mật khẩu mới phải khác mật khẩu cũ",
+      };
   }
   if (!error || error.status === 0 || /network|fetch/i.test(error.message)) {
     return { field: "form", message: NETWORK_MESSAGE };
@@ -76,7 +99,10 @@ const fail = (error: Parameters<typeof mapAuthError>[0]): Result => ({
   failure: mapAuthError(error),
 });
 
-export async function signUp({ email, password }: SignUpValues): Promise<Result> {
+export async function signUp({
+  email,
+  password,
+}: SignUpValues): Promise<Result> {
   const { data, error } = await supabase.auth.signUp({
     email: email.trim(),
     password,
@@ -90,8 +116,14 @@ export async function signUp({ email, password }: SignUpValues): Promise<Result>
   return ok;
 }
 
-export async function signIn({ email, password }: SignInValues): Promise<Result> {
-  const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+export async function signIn({
+  email,
+  password,
+}: SignInValues): Promise<Result> {
+  const { error } = await supabase.auth.signInWithPassword({
+    email: email.trim(),
+    password,
+  });
   return error ? fail(error) : ok;
 }
 
@@ -105,15 +137,21 @@ export async function resendConfirmation(email: string): Promise<Result> {
 }
 
 /** Always resolves ok unless the network fails, so the UI never reveals whether an email exists (ACC-09). */
-export async function requestPasswordReset({ email }: ForgotPasswordValues): Promise<Result> {
+export async function requestPasswordReset({
+  email,
+}: ForgotPasswordValues): Promise<Result> {
   const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
     redirectTo: authRedirectUrl("reset-password"),
   });
   const failure = error ? mapAuthError(error) : null;
-  return failure && failure.message.startsWith("Không kết nối") ? { ok: false, failure } : ok;
+  return failure && failure.message.startsWith("Không kết nối")
+    ? { ok: false, failure }
+    : ok;
 }
 
-export async function updatePassword({ password }: NewPasswordValues): Promise<Result> {
+export async function updatePassword({
+  password,
+}: NewPasswordValues): Promise<Result> {
   const { error } = await supabase.auth.updateUser({ password });
   return error ? fail(error) : ok;
 }
@@ -124,15 +162,22 @@ export async function signOut(): Promise<Result> {
 }
 
 // ---------------------------------------------------------------- callback
-export type CallbackParams = { code?: string | string[]; next?: string | string[] };
+export type CallbackParams = {
+  code?: string | string[];
+  next?: string | string[];
+};
 
 /** Reads the PKCE code and destination from the deep-link query (first value wins). */
 export function parseAuthCallback(params: CallbackParams): {
   code: string | null;
   next: "home" | "reset-password";
 } {
-  const first = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v) ?? null;
-  return { code: first(params.code), next: first(params.next) === "reset-password" ? "reset-password" : "home" };
+  const first = (v?: string | string[]) =>
+    (Array.isArray(v) ? v[0] : v) ?? null;
+  return {
+    code: first(params.code),
+    next: first(params.next) === "reset-password" ? "reset-password" : "home",
+  };
 }
 
 export async function exchangeCode(code: string): Promise<Result> {

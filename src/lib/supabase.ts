@@ -15,6 +15,8 @@ export const supabase = createClient(url, anonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+    // PKCE: confirmation/recovery links carry ?code= that /auth/callback exchanges (issue #12).
+    flowType: "pkce",
   },
 });
 
