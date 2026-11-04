@@ -20,15 +20,17 @@ import { ProfileForm } from "@/features/profile/profile-form";
  */
 export default function OnboardingScreen() {
   const save = useSaveProfile();
+  // The last profile typed; kept when going back from the summary so nothing is retyped.
   const [draft, setDraft] = useState<Profile | null>(null);
+  const [showSummary, setShowSummary] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Back on the summary returns to the form; on the form it asks to leave the app (§3.5).
   useFocusEffect(
     useCallback(() => {
       const sub = BackHandler.addEventListener("hardwareBackPress", () => {
-        if (draft) {
-          setDraft(null);
+        if (showSummary) {
+          setShowSummary(false);
           return true;
         }
         Alert.alert("Thoát app?", "Hồ sơ chưa được lưu.", [
@@ -42,10 +44,10 @@ export default function OnboardingScreen() {
         return true;
       });
       return () => sub.remove();
-    }, [draft]),
+    }, [showSummary]),
   );
 
-  if (draft) {
+  if (draft && showSummary) {
     // A new account has no custom goals yet and Workout is off (GOAL-02).
     const targets = computeTargets(
       draft,
@@ -54,15 +56,19 @@ export default function OnboardingScreen() {
     );
     const start = async () => {
       setError(null);
-      const result = await save.mutateAsync(draft);
-      if (!result.ok) setError(result.failure.message); // stay here, keep the draft (ACC-14)
+      try {
+        const result = await save.mutateAsync(draft);
+        if (!result.ok) setError(result.failure.message); // stay here, keep the draft (ACC-14)
+      } catch {
+        setError("Không lưu được. Thử lại sau.");
+      }
     };
     return (
       <FormScreen
         title="Mục tiêu gợi ý"
         subtitle="Tính từ hồ sơ của bạn. Bạn sửa được trong Cài đặt › Mục tiêu."
         testID="screen-onboarding-summary"
-        onBack={() => setDraft(null)}
+        onBack={() => setShowSummary(false)}
       >
         <TargetsSummary targets={targets} workoutEnabled={false} />
         <FormError message={error} testID="onboarding-error" />
@@ -83,12 +89,11 @@ export default function OnboardingScreen() {
       testID="screen-onboarding"
     >
       <ProfileForm
-        initialValues={
-          save.variables ? toFormValues(save.variables) : EMPTY_PROFILE_FORM
-        }
+        initialValues={draft ? toFormValues(draft) : EMPTY_PROFILE_FORM}
         submitLabel="Tiếp tục"
         onSubmit={async (p) => {
           setDraft(p);
+          setShowSummary(true);
           return { ok: true };
         }}
       />

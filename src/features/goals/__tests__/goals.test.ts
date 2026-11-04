@@ -29,6 +29,8 @@ describe("parseGoalInput", () => {
     expect(parseGoalInput("-500")).toBe(-500);
     expect(parseGoalInput("−500")).toBe(-500);
     expect(parseGoalInput(" 1 800 ")).toBe(1800);
+    expect(parseGoalInput("2.056")).toBe(2056);
+    expect(parseGoalInput("-1.500")).toBe(-1500);
     expect(parseGoalInput("12.5")).toBeNull();
     expect(parseGoalInput("abc")).toBeNull();
     expect(parseGoalInput("")).toBeNull();
@@ -84,6 +86,13 @@ describe("form values", () => {
       ...suggestedOnly,
       calorieTarget: "1800",
     });
+    // A saved positive adjustment keeps its sign when the screen is reopened (Goals.md §2).
+    expect(toGoalsFormValues({ calorieAdjustment: 1 }).calorieAdjustment).toBe(
+      "+1",
+    );
+    expect(toGoalsFormValues({ calorieAdjustment: -1 }).calorieAdjustment).toBe(
+      "-1",
+    );
   });
 
   it("previews valid typing and keeps the saved value while a field is invalid", () => {

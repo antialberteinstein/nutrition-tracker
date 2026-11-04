@@ -18,6 +18,7 @@ import {
   draftOverrides,
   GOAL_FIELDS,
   type GoalField,
+  goalInputText,
   goalsFormSchema,
   type GoalsFormOutput,
   type GoalsFormValues,
@@ -33,10 +34,6 @@ type Props = {
   onDirtyChange?: (dirty: boolean) => void;
   currentYear?: number;
 };
-
-/** Text the input shows while a field follows its suggestion (parseable, ASCII sign). */
-const inputText = (n: number, signed?: boolean) =>
-  signed && n > 0 ? `+${n}` : String(n);
 
 /** Cài đặt › Mục tiêu (Goals.md §2–3): edit adjustment and targets, see warnings live. */
 export function GoalsForm({
@@ -74,7 +71,10 @@ export function GoalsForm({
 
   const submit = handleSubmit(async (output) => {
     setFormError(null);
-    const result = await onSubmit(output);
+    const result = await onSubmit(output).catch((): Result => ({
+      ok: false,
+      failure: { field: "form", message: "Không lưu được. Thử lại sau." },
+    }));
     if (result.ok) {
       reset(getValues());
       setSavedNotice(true);
@@ -113,7 +113,7 @@ export function GoalsForm({
           <View style={styles.field}>
             <TextField
               label={`${meta.label} (${meta.unit})`}
-              value={f.value ?? inputText(suggested[name], meta.signed)}
+              value={f.value ?? goalInputText(name, suggested[name])}
               onChangeText={f.onChange}
               onBlur={f.onBlur}
               error={errors[name]?.message}
@@ -133,6 +133,7 @@ export function GoalsForm({
                 </ThemedText>
                 <Button
                   label="Dùng gợi ý"
+                  accessibilityLabel={`Dùng gợi ý cho ${meta.label}`}
                   variant="text"
                   onPress={() =>
                     setValue(name, null, {

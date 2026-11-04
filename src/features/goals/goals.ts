@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 
+import { formatInt } from "@/domain/format";
 import {
   type BmiCategory,
   computeTargets,
@@ -57,10 +58,16 @@ export const GOAL_FIELD_NAMES = Object.keys(GOAL_FIELDS) as GoalField[];
 export type GoalsFormValues = Record<GoalField, string | null>;
 export type GoalsFormOutput = Record<GoalField, number | null>;
 
-/** Accepts "+300", "-500" and the typographic minus "−500"; integers only. */
+/** Accepts "+300", "-500", the typographic minus "−500" and dot grouping "2.056"; integers only. */
 export function parseGoalInput(text: string): number | null {
-  const t = text.replace(/\s/g, "").replace("−", "-");
+  let t = text.replace(/\s/g, "").replace("−", "-");
+  if (/^[+-]?\d{1,3}(\.\d{3})+$/.test(t)) t = t.replace(/\./g, "");
   return /^[+-]?\d{1,5}$/.test(t) ? Number(t) : null;
+}
+
+/** Input text for a value: the signed adjustment always shows its sign ("+300", "-500"). */
+export function goalInputText(field: GoalField, n: number): string {
+  return GOAL_FIELDS[field].signed && n > 0 ? `+${n}` : String(n);
 }
 
 const goalInput = (field: GoalField) => {
@@ -80,7 +87,7 @@ const goalInput = (field: GoalField) => {
       else if (n < min || n > max)
         ctx.addIssue({
           code: "custom",
-          message: `Từ ${min} đến ${max} ${unit}`,
+          message: `Từ ${formatInt(min)} đến ${formatInt(max)} ${unit}`,
         });
     })
     .transform((v) => (v === null ? null : parseGoalInput(v)));
@@ -96,14 +103,16 @@ export const goalsFormSchema = z.object({
 });
 
 export function toGoalsFormValues(o: GoalOverrides): GoalsFormValues {
-  const text = (n: number | null | undefined) =>
-    n === null || n === undefined ? null : String(n);
+  const text = (f: GoalField) => {
+    const n = o[f];
+    return n === null || n === undefined ? null : goalInputText(f, n);
+  };
   return {
-    calorieAdjustment: text(o.calorieAdjustment),
-    calorieTarget: text(o.calorieTarget),
-    proteinTargetG: text(o.proteinTargetG),
-    sodiumTargetMg: text(o.sodiumTargetMg),
-    sugarTargetG: text(o.sugarTargetG),
+    calorieAdjustment: text("calorieAdjustment"),
+    calorieTarget: text("calorieTarget"),
+    proteinTargetG: text("proteinTargetG"),
+    sodiumTargetMg: text("sodiumTargetMg"),
+    sugarTargetG: text("sugarTargetG"),
   };
 }
 
@@ -207,7 +216,8 @@ export function useTargets(): {
   const goals = useGoals();
   const workout = useWorkoutEnabled();
   const workoutEnabled = workout.data ?? false;
-  const ready = profile.data && goals.data;
+  // A failed settings read must not silently show a TDEE without Workout (0.2.0).
+  const ready = profile.data && goals.data && workout.data !== undefined;
   return {
     profile: profile.data ?? undefined,
     goals: goals.data,

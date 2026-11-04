@@ -11,6 +11,7 @@ import {
   type GoalOverrides,
   type Profile,
 } from "@/domain/nutrition";
+import { formatInt } from "@/domain/format";
 import type { Result } from "@/features/auth/auth";
 import type { GoalsFormOutput } from "@/features/goals/goals";
 import { GoalsForm } from "@/features/goals/goals-form";
@@ -154,14 +155,35 @@ describe("GoalsForm (Cài đặt › Mục tiêu)", () => {
     ).toBe(true);
   });
 
-  it("GOAL-09: a custom calorie target keeps sugar bounds on 1800 and labels the suggestion", async () => {
-    await setup(example1, { calorieTarget: 1800 });
+  it("GOAL-09: a custom 1800 survives a weight change; the suggestion label and sugar follow", async () => {
+    const onSubmit = jest.fn<Submit>();
+    const view = await setup(example1, { calorieTarget: 1800 }, onSubmit);
     expect(text("goal-calorieTarget-custom")).toBe(
       "Tự đặt · gợi ý: 2.056 kcal",
     );
-    expect(input("goal-sugarTargetG")).toBe(
-      String(Math.round((0.05 * 1800) / 4)),
+    const sugar = String(Math.round((0.05 * 1800) / 4));
+    expect(input("goal-sugarTargetG")).toBe(sugar);
+
+    const heavier = { ...example1, weightKg: 80 };
+    const tdee = computeTargets(
+      heavier,
+      {},
+      { currentYear: YEAR, workoutEnabled: false },
+    ).tdee;
+    await view.rerender(
+      <GoalsForm
+        profile={heavier}
+        saved={{ calorieTarget: 1800 }}
+        workoutEnabled={false}
+        onSubmit={onSubmit}
+        currentYear={YEAR}
+      />,
     );
+    expect(input("goal-calorieTarget")).toBe("1800");
+    expect(text("goal-calorieTarget-custom")).toBe(
+      `Tự đặt · gợi ý: ${formatInt(tdee - 500)} kcal`,
+    );
+    expect(input("goal-sugarTargetG")).toBe(sugar);
   });
 
   it("GOAL-10: 'Dùng gợi ý' clears the custom value and saves null", async () => {

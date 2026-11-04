@@ -94,6 +94,8 @@ type ButtonProps = {
   variant?: "filled" | "text";
   loading?: boolean;
   disabled?: boolean;
+  /** Spoken name when the visible label is ambiguous (e.g. several "Dùng gợi ý"). */
+  accessibilityLabel?: string;
   /** Called when a disabled button is tapped, e.g. to reveal why a form is locked. */
   onPressWhileDisabled?: () => void;
   testID?: string;
@@ -107,6 +109,7 @@ export function Button({
   loading,
   disabled,
   onPressWhileDisabled,
+  accessibilityLabel,
   testID,
 }: ButtonProps) {
   const { colors } = useTheme();
@@ -121,7 +124,7 @@ export function Button({
         loading || (disabled && !onPressWhileDisabled) ? true : undefined
       }
       accessibilityRole="button"
-      accessibilityLabel={label}
+      accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ disabled: !!inactive, busy: !!loading }}
       testID={testID}
       style={({ pressed }) => [

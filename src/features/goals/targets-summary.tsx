@@ -12,7 +12,11 @@ type RowProps = { label: string; value: string; testID?: string };
 /** Label on the left, tabular number on the right. */
 export function MetricRow({ label, value, testID }: RowProps) {
   return (
-    <View style={styles.row}>
+    <View
+      style={styles.row}
+      accessible
+      accessibilityLabel={`${label}, ${value}`}
+    >
       <ThemedText variant="body" color="onSurfaceVariant">
         {label}
       </ThemedText>
