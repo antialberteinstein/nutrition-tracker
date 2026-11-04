@@ -52,5 +52,7 @@ jobs:
           version: 3.0.0 # keep in sync with the `supabase` devDependency
       - name: Start Postgres and apply migrations
         run: supabase db start
+      - name: Reset database (migrations + seed.sql)
+        run: supabase db reset
       - name: Run pgTAP suites (supabase/tests)
         run: supabase test db
