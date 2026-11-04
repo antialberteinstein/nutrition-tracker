@@ -202,3 +202,22 @@ Mẫu một mục:
   - ADR-014 thay một phần ADR-012 (vị trí script); chủ dự án duyệt khi chọn phạm vi.
   - Không sửa đường dẫn cũ trong `prompts/*.txt` và các mục LOG cũ (lịch sử).
 - **Kết quả:** PR `chore/37-move-e2e-scripts`.
+
+## 2026-11-05 · `Dùng cách build trên cloud đi` — APK E2E qua EAS
+- **Yêu cầu:** Máy hết dung lượng nên không build APK local được; build APK cho E2E trên cloud.
+- **Quyết định:**
+  - Tạo project EAS `@antialberteinstein/nutrition-tracker`, ghi `extra.eas.projectId` vào `app.config.ts`.
+  - `eas.json`: profile `e2e` (APK debug, `:app:assembleDebug`, không cần credentials, tải JS từ Metro như bản build local) và profile `preview` (APK, `appVersionSource: remote`, `autoIncrement`) theo ADR-013.
+  - `build-debug-apk.sh` giữ nguyên; build cloud là lựa chọn thay thế, ghi trong `docs/testing/test-plan.md`.
+  - Cả hai profile chỉ build `arm64-v8a` (`ORG_GRADLE_PROJECT_reactNativeArchitectures`): APK debug 4 kiến trúc nặng 252 MB, trong đó khoảng 215 MB là thư viện native; dex giữ nguyên vì là mã Java/Kotlin của app.
+- **Kết quả:** PR `chore/23-eas-json` (Refs #23).
+
+## 2026-11-05 · `chỉ cần 1 kiến trúc thôi … loại bỏ hoàn toàn docker-test-related trong này trước khi mở PR` — E2E không cần Docker
+- **Yêu cầu:** Lượt E2E đầu tiên lỗi hết. Muốn APK chỉ một kiến trúc, và E2E không còn phụ thuộc Docker trước khi mở PR.
+- **Quyết định:**
+  - E2E chạy trên project Supabase cloud với tài khoản test do chủ dự án tạo (ADR-015, thay một phần ADR-011/012); pgTAP trong CI giữ Supabase local trên runner GitHub.
+  - Bỏ seed `e2e-a`/`e2e-b` và test pgTAP của seed; tài khoản test đọc từ `config.json` (`testEmail`, `testPassword`), không commit.
+  - Một tài khoản chỉ qua Onboarding được một lần (không có policy xoá hồ sơ); tạo tài khoản mới cho lượt sau, không nới test.
+  - Conftest đưa app lên foreground trước mỗi test, lưu logcat khi lỗi; `go_to_login` không bấm Back khi app đã rời màn hình (trước đó test chạy tiếp trên launcher và app khác).
+  - Lượt E2E phát hiện lỗi app: chưa đăng nhập, mở app ra "Unmatched Route" (`/` chỉ khớp `(tabs)/index` đang bị guard). Sửa ở PR riêng.
+- **Kết quả:** PR `chore/23-eas-json`.

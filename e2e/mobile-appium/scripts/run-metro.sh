@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Start the Expo Metro bundler for the debug APK (ADR-012). Run it in its own terminal.
-# Loads E2E environment variables from .env.e2e when present (local Supabase, never real data).
+# Loads E2E environment variables from .env.e2e when present (Supabase cloud URL + anon key, ADR-015).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"

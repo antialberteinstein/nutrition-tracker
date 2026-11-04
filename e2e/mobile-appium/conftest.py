@@ -1,8 +1,11 @@
 """Shared Appium fixtures for the mobile E2E suite (ADR-012, docs/testing/test-plan.md).
 
-- Reads the device config from config.json (gitignored; copy config.example.json).
+- Reads the device config and the cloud test account from config.json (gitignored; copy
+  config.example.json). E2E runs against the Supabase cloud project (ADR-015).
 - Creates one UiAutomator2 session per test session.
-- On a failed test, saves a screenshot and the UI page source into reports/.
+- Before every test, brings the app under test to the foreground and fails fast if it is not there,
+  so a test never runs against another app.
+- On a failed test, saves a screenshot, the UI page source and the app's logcat into reports/.
 """
 
 from __future__ import annotations
@@ -29,7 +32,7 @@ def load_config() -> dict:
             returncode=2,
         )
     config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
-    for key in ("udid", "appiumServer", "apkPath", "appPackage"):
+    for key in ("udid", "appiumServer", "apkPath", "appPackage", "testEmail", "testPassword"):
         if not config.get(key):
             pytest.exit(f"config.json is missing '{key}'.", returncode=2)
     return config
@@ -59,6 +62,26 @@ def driver(config: dict):
     session.quit()
 
 
+@pytest.fixture(autouse=True)
+def app_in_foreground(request, config: dict):
+    """Each test starts with the app under test on screen; otherwise it fails with what is on screen."""
+    if "driver" not in request.fixturenames:
+        yield
+        return
+    session = request.getfixturevalue("driver")
+    package = config["appPackage"]
+    if session.current_package != package:
+        session.activate_app(package)
+    current = session.current_package
+    if current != package:
+        pytest.fail(f"App {package} is not in the foreground (on screen: {current}).")
+    yield
+
+
+# Logcat tags worth keeping: JS console/errors, native crashes, Expo modules. Other apps' lines are dropped.
+_LOGCAT_KEEP = re.compile(r"ReactNativeJS|ReactNative|AndroidRuntime|Expo|Hermes|FATAL|nutritiontracker")
+
+
 def _safe_name(nodeid: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]+", "_", nodeid).strip("_")
 
@@ -69,7 +92,7 @@ def pytest_runtest_makereport(item, call):
     report = outcome.get_result()
     # Fixtures can read item.rep_call to act only after a failed test.
     setattr(item, f"rep_{report.when}", report)
-    if report.when != "call" or not report.failed:
+    if report.when not in ("setup", "call") or not report.failed:
         return
     session = item.funcargs.get("driver")
     if session is None:
@@ -77,10 +100,14 @@ def pytest_runtest_makereport(item, call):
     name = _safe_name(item.nodeid)
     shots = REPORTS_DIR / "screenshots"
     sources = REPORTS_DIR / "page-source"
-    shots.mkdir(parents=True, exist_ok=True)
-    sources.mkdir(parents=True, exist_ok=True)
+    logcat = REPORTS_DIR / "logcat"
+    for folder in (shots, sources, logcat):
+        folder.mkdir(parents=True, exist_ok=True)
     try:
         session.get_screenshot_as_file(str(shots / f"{name}.png"))
         (sources / f"{name}.xml").write_text(session.page_source, encoding="utf-8")
+        lines = [e.get("message", "") for e in session.get_log("logcat")]
+        kept = [line for line in lines if _LOGCAT_KEEP.search(line)]
+        (logcat / f"{name}.txt").write_text("\n".join(kept), encoding="utf-8")
     except Exception as exc:  # the report must still be written if the session died
         print(f"[e2e] could not capture failure artifacts for {name}: {exc}")

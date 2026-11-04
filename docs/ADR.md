@@ -22,10 +22,11 @@
 | ADR-008 | Workout: bitmask thứ trong tuần, chặn trùng O(1) mỗi cặp, không có lặp hằng tháng | Chấp nhận | 2026-11-04 |
 | ADR-009 | Biểu đồ: `victory-native` (Skia) | Chấp nhận | 2026-11-04 |
 | ADR-010 | State và form: TanStack Query, react-hook-form + zod | Chấp nhận | 2026-11-04 |
-| ADR-011 | Môi trường và migration: Supabase local + 1 cloud, `supabase db push` thủ công | Chấp nhận | 2026-11-04 |
-| ADR-012 | Kiểm thử: Jest, pgTAP, Appium (Python/uv) trên thiết bị thật | Chấp nhận; phần vị trí script bị thay thế bởi ADR-014 | 2026-11-04 |
+| ADR-011 | Môi trường và migration: Supabase local + 1 cloud, `supabase db push` thủ công | Chấp nhận; phần "local cho test" của E2E bị thay thế bởi ADR-015 | 2026-11-04 |
+| ADR-012 | Kiểm thử: Jest, pgTAP, Appium (Python/uv) trên thiết bị thật | Chấp nhận; phần vị trí script bị thay thế bởi ADR-014, phần dữ liệu E2E bởi ADR-015 | 2026-11-04 |
 | ADR-013 | Phát hành: EAS Build APK, GitHub Release + SHA-256, không OTA | Chấp nhận | 2026-11-04 |
 | ADR-014 | Script E2E nằm trong `e2e/mobile-appium/scripts/` (thay một phần ADR-012) | Chấp nhận | 2026-11-05 |
+| ADR-015 | E2E chạy trên Supabase cloud với tài khoản test, không cần Docker (thay một phần ADR-011, ADR-012) | Chấp nhận | 2026-11-05 |
 
 ---
 
@@ -297,7 +298,7 @@ conflict(A, B) =
 
 ## ADR-011. Môi trường và migration
 
-- Trạng thái: **Chấp nhận** · Ngày: 2026-11-04
+- Trạng thái: **Chấp nhận**; **phần dùng Supabase local cho E2E bị thay thế bởi ADR-015** · Ngày: 2026-11-04
 
 **Quyết định.**
 - **Local:** Supabase CLI + Docker (`supabase start`) cho dev, test và CI.
@@ -318,7 +319,7 @@ conflict(A, B) =
 
 ## ADR-012. Kiểm thử
 
-- Trạng thái: **Chấp nhận** (có bổ sung của chủ dự án: E2E bằng Appium + Python/uv); **phần vị trí `run-metro.sh` và `run-test.sh` bị thay thế bởi ADR-014** · Ngày: 2026-11-04
+- Trạng thái: **Chấp nhận** (có bổ sung của chủ dự án: E2E bằng Appium + Python/uv); **phần vị trí `run-metro.sh` và `run-test.sh` bị thay thế bởi ADR-014**; **phần dữ liệu test E2E bị thay thế bởi ADR-015** · Ngày: 2026-11-04
 
 | Lớp | Công cụ | Chạy ở đâu | Phủ |
 |---|---|---|---|
@@ -417,3 +418,29 @@ scripts/
 - Mã thoát (0/1/2/3) và quy tắc cho agent của ADR-012 giữ nguyên; chỉ đổi đường dẫn: agent chỉ chạy `e2e/mobile-appium/scripts/run-test.sh`, và chỉ khi người dùng yêu cầu.
 
 **Hệ quả.** Đường dẫn cũ trong `prompts/*.txt` và các mục cũ của `prompts/LOG.md` là lịch sử, không sửa. **Xem lại khi** có thêm bộ E2E thứ hai (ví dụ iOS) cần dùng chung script.
+
+---
+
+## ADR-015. E2E chạy trên Supabase cloud với tài khoản test, không cần Docker
+
+- Trạng thái: **Chấp nhận** · Thay thế một phần ADR-011 (Supabase local dùng cho test E2E) và ADR-012 (dữ liệu E2E: seed trên Supabase local; "không chạy E2E trên project cloud chứa dữ liệu thật") · Ngày: 2026-11-05 · Người quyết định: chủ dự án
+
+**Bối cảnh.** Chạy E2E cần Supabase local, tức Docker với khoảng 8 GB image. Máy dev từng hết dung lượng giữa chừng, làm hỏng image và chặn cả lượt test. Appium vốn chạy thủ công trên thiết bị thật, không chạy trong CI.
+
+**Phương án.**
+- Giữ Supabase local cho E2E (ADR-012).
+- Project cloud thứ hai làm staging: sạch nhất, nhưng phải quản lý thêm một môi trường và tự `db push` lên đó.
+- **E2E dùng project cloud hiện có với tài khoản test riêng.**
+
+**Quyết định.** Phương án thứ ba.
+- Tài khoản test do chủ dự án tạo trên dashboard (Authentication → Add user, tự xác nhận email). Email và mật khẩu nằm trong `e2e/mobile-appium/config.json` (`testEmail`, `testPassword`; không commit).
+- `.env.e2e` (không commit) chứa URL và anon key của project cloud; `run-metro.sh` nạp file này.
+- Bỏ seed `e2e-a`/`e2e-b` (`supabase/seed.sql`) và test pgTAP kiểm tra seed. **pgTAP trong CI giữ nguyên** trên Supabase local chạy trong runner GitHub; máy dev không cần Docker để chạy E2E.
+
+**Hệ quả.**
+- E2E chỉ kiểm được schema **đã `db push`** lên cloud, tức là sau khi PR có migration đã merge và được áp dụng. Nhánh có migration mới chưa chạy E2E được trước khi merge.
+- `profiles` không có policy xoá, nên một tài khoản chỉ đi qua Onboarding được **một lần**. Sau một lượt đạt, chủ dự án tạo tài khoản test mới (ví dụ `testuser002@…`) và sửa `config.json`. Test không được nới để chạy lại trên tài khoản đã có hồ sơ.
+- Mỗi lượt, TC-E2E-01 tạo thêm một user chưa xác nhận, TC-E2E-07 gửi email đặt lại mật khẩu trên project thật. Email mặc định của Supabase có giới hạn tần suất (và có thể chỉ gửi tới địa chỉ thành viên project), nên hai test này có thể lỗi vì giới hạn email chứ không phải vì app. Khi đó cấu hình SMTP riêng hoặc ghi rõ trong báo cáo.
+- Tài khoản test thấy được dữ liệu của chính nó; RLS (ADR-003) giữ dữ liệu người dùng khác tách biệt.
+
+**Xem lại khi:** có người dùng thật ngoài chủ dự án, cần chạy E2E trước khi merge migration, hoặc giới hạn email làm E2E lỗi thường xuyên (khi đó cân nhắc project staging).

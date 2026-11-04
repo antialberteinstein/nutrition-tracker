@@ -28,6 +28,7 @@ Mọi quyết định kỹ thuật nằm trong **`docs/ADR.md`**, một file duy
   - Jest, pgTAP, Appium;
   - phát hành APK qua EAS, không OTA.
 - **ADR-014:** script chạy Metro và E2E nằm ở `e2e/mobile-appium/scripts/`; `scripts/` chỉ còn build APK (thay một phần ADR-012).
+- **ADR-015:** E2E chạy trên Supabase cloud với tài khoản test trong `config.json`, không cần Docker; Supabase local chỉ còn cho pgTAP/CI và dev (thay một phần ADR-011, ADR-012).
 - **Bị loại, không đề xuất lại:** Firebase Auth/Firestore, backend riêng, offline sync, Maestro/Detox, lặp hằng tháng, exclusion constraint cho lịch, OTA update, Dynamic Color.
 
 ### Cách dùng `docs/ADR.md`
@@ -86,7 +87,7 @@ npx expo install <pkg>   # luôn dùng thay cho npm install để có phiên b�
   3. xem `appium.log`.
 
   Sửa xong thì chạy lại. Không nới điều kiện test khi AC chưa đổi.
-- `e2e/mobile-appium/config.json` (UDID) và `reports/` không commit. Chi tiết: `docs/testing/test-plan.md`.
+- `e2e/mobile-appium/config.json` (UDID, tài khoản test cloud) và `reports/` không commit. Chi tiết: `docs/testing/test-plan.md`.
 
 ## Điểm dễ hỏng
 

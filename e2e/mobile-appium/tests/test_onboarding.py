@@ -1,5 +1,5 @@
-"""Onboarding and Cài đặt › Hồ sơ E2E (issue #13). Requires a freshly reset Supabase local
-(`npx supabase db reset`, test-plan §3): seed user e2e-a starts without a profile.
+"""Onboarding and Cài đặt › Hồ sơ E2E (issue #13). Requires a cloud test account that has no
+profile yet (ADR-015, test-plan §3); after a passing run, create a new account for the next one.
 
 Runs after test_auth.py (alphabetical order), which leaves the app on Đăng nhập.
 """
@@ -10,7 +10,7 @@ import pytest
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.support.ui import WebDriverWait
 
-from test_auth import SEED_EMAIL, SEED_PASSWORD, go_to_login
+from test_auth import TEST_EMAIL, TEST_PASSWORD, go_to_login
 
 YEAR = datetime.date.today().year
 
@@ -39,8 +39,8 @@ def type_into(driver, test_id, text):
 
 def sign_in(driver):
     go_to_login(driver)
-    type_into(driver, "login-email", SEED_EMAIL)
-    type_into(driver, "login-password", SEED_PASSWORD)
+    type_into(driver, "login-email", TEST_EMAIL)
+    type_into(driver, "login-password", TEST_PASSWORD)
     by_id(driver, "login-submit").click()
 
 
@@ -128,7 +128,7 @@ def test_onboarding_validation_then_save(driver, config):
     sign_in(driver)
     if driver.find_elements(AppiumBy.ID, "screen-today"):
         sign_out_from_tabs(driver)  # leave the app signed out for the tests that follow
-        pytest.skip("e2e-a already has a profile: run `npx supabase db reset` first")
+        pytest.skip("the test account already has a profile: create a new one (test-plan §3)")
     assert by_id(driver, "screen-onboarding").is_displayed()
     wait_until(driver, submit_is(False))
 
