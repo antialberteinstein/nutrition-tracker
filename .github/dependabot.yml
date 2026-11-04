@@ -36,13 +36,17 @@ updates:
       - dependency-name: "@types/react"
       # Expo packages: patch updates within the SDK line are fine; minor/major come with an SDK bump.
       - dependency-name: "expo"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+        update-types:
+          ["version-update:semver-minor", "version-update:semver-major"]
       - dependency-name: "expo-*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+        update-types:
+          ["version-update:semver-minor", "version-update:semver-major"]
       - dependency-name: "@expo/*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+        update-types:
+          ["version-update:semver-minor", "version-update:semver-major"]
       - dependency-name: "jest-expo"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+        update-types:
+          ["version-update:semver-minor", "version-update:semver-major"]
       # Tooling majors the SDK does not support yet (TypeScript ~6.0 pinned; eslint-config-expo on ESLint 9).
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
