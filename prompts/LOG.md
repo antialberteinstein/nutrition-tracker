@@ -119,3 +119,11 @@ Mẫu một mục:
   - Đóng #4 (ESLint 10) và #5 (TypeScript 7), vì làm đỏ CI và SDK chưa hỗ trợ.
   - Dependabot: bỏ qua mọi bản nâng của React/React Native do SDK ghim; với `expo*` chỉ nhận bản patch; TypeScript và ESLint bỏ qua bản major.
 - **Kết quả:** PR #27.
+
+## 2026-11-04 · `/kessie-skills:proj build #7 -> #15` — #9 Schema hồ sơ
+- **Yêu cầu:** Issue #9: tạo bảng `profiles`, `goals`, `user_settings` kèm RLS và test hai tài khoản.
+- **Quyết định:**
+  - `user_id` mặc định là `auth.uid()`; RLS chỉ có select/insert/update cho chủ sở hữu, không có policy delete (dữ liệu chỉ bị xoá theo cascade khi xoá tài khoản, #21).
+  - Tuổi 13–100 kiểm bằng trigger, vì phụ thuộc năm hiện tại.
+  - Giờ nhắc phải là bội số của 5 phút (check constraint).
+- **Kết quả:** PR `feat/9-profile-schema`.
