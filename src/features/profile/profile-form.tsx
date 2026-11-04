@@ -43,6 +43,7 @@ export function ProfileForm({
     control,
     handleSubmit,
     reset,
+    trigger,
     formState: { errors, isValid, isSubmitting, isDirty },
   } = useForm<ProfileFormValues, unknown, ProfileFormOutput>({
     resolver: zodResolver(schema),
@@ -52,9 +53,7 @@ export function ProfileForm({
   });
 
   // Choice groups have no blur, so name every missing field next to the locked button.
-  const missing = missingProfileFields(
-    useWatch({ control }) as ProfileFormValues,
-  );
+  const missing = missingProfileFields(useWatch({ control }));
 
   useEffect(() => {
     onDirtyChange?.(isDirty);
@@ -163,6 +162,7 @@ export function ProfileForm({
         <ThemedText
           variant="bodySmall"
           color="onSurfaceVariant"
+          accessibilityLiveRegion="polite"
           testID="profile-missing"
         >
           {`Còn thiếu: ${missing.join(", ")}`}
@@ -172,6 +172,8 @@ export function ProfileForm({
         label={submitLabel}
         onPress={() => void submit()}
         disabled={!isValid}
+        // ACC-05: tapping the locked button shows each field's error under that field.
+        onPressWhileDisabled={() => void trigger()}
         loading={isSubmitting}
         testID="profile-submit"
       />

@@ -61,6 +61,12 @@ describe("ProfileForm", () => {
     await fireEvent(screen.getByTestId("profile-weight"), "blur");
     expect(await screen.findByTestId("profile-weight-error")).toBeTruthy();
 
+    // Tapping the locked button reveals the error under every blank field, choices included.
+    await fireEvent.press(screen.getByTestId("profile-submit"));
+    expect(await screen.findByTestId("profile-goal-error")).toBeTruthy();
+    expect(screen.getByTestId("profile-sex-error")).toBeTruthy();
+    expect(screen.getByTestId("profile-height-error")).toBeTruthy();
+
     await fillValid();
     await waitFor(() =>
       expect(screen.queryByTestId("profile-missing")).toBeNull(),
