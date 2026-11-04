@@ -23,4 +23,4 @@
 3. `gh release create vX.Y.Z --verify-tag [--prerelease] --notes-file notes.md` (ghi chú lấy từ CHANGELOG).
 4. Build APK bằng EAS (profile `preview`), đính kèm APK và `SHA256SUMS` vào GitHub Release (ADR-013). Hỏi người dùng trước khi tạo tag và release.
 - Không di chuyển/dùng lại tag. Phát hành sai → bản patch mới. Build number (`android.versionCode`) do EAS quản lý (`appVersionSource: remote`).
-- Migration: áp dụng lên Supabase cloud bằng `npx supabase db push` sau khi PR đã merge, có hỏi người dùng (ADR-011).
+- Migration: áp dụng lên Supabase cloud bằng `npx supabase db push --remote` (CLI 3 mặc định trỏ vào stack local; chạy `--dry-run` trước) sau khi PR đã merge, có hỏi người dùng (ADR-011).

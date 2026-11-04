@@ -56,6 +56,21 @@ describe("routeState (Account.md §3.1)", () => {
   it("a failed profile check never falls back to onboarding", () => {
     expect(open({ profile: "error" })).toBe("profile-error");
   });
+
+  // A guarded route (e.g. "/" = (tabs)/index on a cold start) must redirect to a real screen, not
+  // to the (auth) group, which has no index and rendered "Unmatched Route" on a fresh install.
+  it("ACC-10: guarded routes redirect to the one open destination", () => {
+    const redirect = (input: Partial<RouteInput>) => {
+      const state = routeState({ ...base, ...input });
+      return state.kind === "ready" ? state.redirect : state.kind;
+    };
+    expect(redirect({ signedIn: false, profile: "pending" })).toBe("/login");
+    expect(redirect({ recovering: true, profile: "pending" })).toBe(
+      "/reset-password",
+    );
+    expect(redirect({ profile: "no" })).toBe("/onboarding");
+    expect(redirect({ profile: "yes" })).toBe("/");
+  });
 });
 
 describe("profileCheck", () => {

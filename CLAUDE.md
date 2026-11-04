@@ -72,7 +72,7 @@ npx expo install <pkg>   # luôn dùng thay cho npm install để có phiên b�
 
 - **Migration chỉ thêm, không sửa**, nằm trong `supabase/migrations/` (tạo bằng `npx supabase migration new <tên>`).
   - Không sửa migration đã áp dụng. Không sửa schema trên dashboard.
-  - Áp dụng lên cloud bằng `npx supabase db push`, chỉ sau khi PR đã merge và đã hỏi người dùng.
+  - Áp dụng lên cloud bằng `npx supabase db push --remote` (CLI 3 không có `--remote` thì trỏ vào stack local; chạy `--dry-run` trước), chỉ sau khi PR đã merge và đã hỏi người dùng.
 - **Mọi bảng `public` bật RLS** với `user_id = auth.uid()`. Test `supabase/tests/database/000_rls_enabled.test.sql` bắt bảng nào quên bật.
 - **Biến public** chỉ gồm `EXPO_PUBLIC_SUPABASE_URL` và `EXPO_PUBLIC_SUPABASE_ANON_KEY`. Service role key không bao giờ vào client hay git.
 - Dữ liệu sức khoẻ: không log cân nặng, món ăn hay email.

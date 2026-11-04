@@ -22,11 +22,11 @@ import { useTheme } from "@/hooks/use-theme";
 import { createQueryClient } from "@/lib/query-client";
 
 /**
- * Session-based routing (Account.md §3.1, see routeState). A guarded screen that gains focus
- * redirects to the first unguarded route in filesystem sort order (groups first), not declaration
- * order, so Back can never land on it (ACC-10). Every routeState therefore leaves exactly one
- * destination open (signed out: (auth) sorts before auth/callback); keep it that way when adding
- * states, or the destination will depend on file names.
+ * Session-based routing (Account.md §3.1, see routeState). Every routeState leaves exactly one
+ * destination open, and every guarded group redirects there explicitly (`redirectTo`), so Back can
+ * never land on a guarded screen (ACC-10). Without `redirectTo` the router falls back to the first
+ * unguarded route, which is the (auth) group itself: it has no index, so a cold start at "/" while
+ * signed out rendered "Unmatched Route".
  */
 function RootNavigator() {
   const { session, initializing, recovering } = useAuth();
@@ -79,22 +79,22 @@ function RootNavigator() {
     );
   }
 
-  const { guards } = state;
+  const { guards, redirect } = state;
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={guards.auth}>
+      <Stack.Protected guard={guards.auth} redirectTo={redirect}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
-      <Stack.Protected guard={guards.recovery}>
+      <Stack.Protected guard={guards.recovery} redirectTo={redirect}>
         <Stack.Screen name="reset-password" />
       </Stack.Protected>
-      <Stack.Protected guard={guards.onboarding}>
+      <Stack.Protected guard={guards.onboarding} redirectTo={redirect}>
         <Stack.Screen name="onboarding" />
       </Stack.Protected>
-      <Stack.Protected guard={guards.tabs}>
+      <Stack.Protected guard={guards.tabs} redirectTo={redirect}>
         <Stack.Screen name="(tabs)" />
       </Stack.Protected>
-      <Stack.Protected guard={guards.callback}>
+      <Stack.Protected guard={guards.callback} redirectTo={redirect}>
         <Stack.Screen name="auth/callback" />
       </Stack.Protected>
     </Stack>

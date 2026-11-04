@@ -18,6 +18,8 @@
 
 ## 3. Môi trường E2E mobile
 - **Thiết bị:** Android thật, bật *USB debugging*, đã mở khoá màn hình, đã chấp nhận máy tính. Ghi lại model và phiên bản Android trong mỗi báo cáo.
+  - Tắt dịch vụ Autofill (Cài đặt › Mật khẩu và tài khoản › Dịch vụ tự động điền: Không có): hộp "Lưu mật khẩu" che app sau khi test nhập mật khẩu.
+  - Không dùng máy trong lúc test chạy.
 - **Máy tính cần có:**
   - Node LTS;
   - JDK 17 và Android SDK (để build APK);
@@ -28,7 +30,7 @@
 - **Backend:** project Supabase cloud, với một tài khoản test do chủ dự án tạo trên dashboard (Authentication → Add user, tự xác nhận email). App debug đọc URL và anon key của project cloud từ `.env.e2e`.
   - Mỗi tài khoản chỉ đi qua Onboarding được một lần (không có policy xoá hồ sơ). Sau một lượt đạt, tạo tài khoản mới (ví dụ `testuser002@…`) và sửa `testEmail` trong `config.json`.
   - E2E chỉ kiểm được schema đã `db push` lên cloud.
-  - TC-E2E-01 và TC-E2E-07 gửi email thật; nếu lỗi vì giới hạn email của Supabase thì ghi rõ trong báo cáo.
+  - TC-E2E-01 và TC-E2E-07 gửi email thật. Project cloud từ chối domain dành riêng như `.test` (`email_address_invalid`), nên TC-E2E-01 đăng ký bằng `signupEmail` (địa chỉ có thật). Nếu lỗi vì giới hạn email của Supabase thì ghi rõ trong báo cáo.
 - **Cấu hình máy test:** `e2e/mobile-appium/config.json` (**không commit**; có trong `.gitignore`). Mẫu nằm ở `config.example.json`:
   ```json
   {
@@ -37,7 +39,8 @@
     "apkPath": "build/app-debug.apk",
     "appPackage": "<package Android>",
     "testEmail": "<email tài khoản test trên cloud>",
-    "testPassword": "<mật khẩu tài khoản test>"
+    "testPassword": "<mật khẩu tài khoản test>",
+    "signupEmail": "<địa chỉ nhận được thư, có {ts}, ví dụ ten+e2e-{ts}@domain-that>"
   }
   ```
 - **Kết nối Metro:** máy test cắm USB. `run-metro.sh` chạy Metro ở cổng 8081; `run-test.sh` tự làm `adb reverse tcp:8081 tcp:8081` để APK debug tải được JS bundle. Lệnh `adb` chỉ nằm **trong script**.

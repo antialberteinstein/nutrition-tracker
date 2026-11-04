@@ -10,31 +10,9 @@ import pytest
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.support.ui import WebDriverWait
 
-from test_auth import TEST_EMAIL, TEST_PASSWORD, go_to_login
+from test_auth import TEST_EMAIL, TEST_PASSWORD, by_id, go_to_login, type_into
 
 YEAR = datetime.date.today().year
-
-
-def by_id(driver, test_id):
-    """Find by testID, scrolling the form until it is on screen (UiAutomator2 skips off-screen
-    nodes, and the profile and goals forms are taller than a phone screen)."""
-    driver.implicitly_wait(0)
-    try:
-        if not driver.find_elements(AppiumBy.ID, test_id):
-            driver.find_elements(
-                AppiumBy.ANDROID_UIAUTOMATOR,
-                "new UiScrollable(new UiSelector().scrollable(true))"
-                f'.scrollIntoView(new UiSelector().resourceId("{test_id}"))',
-            )
-    finally:
-        driver.implicitly_wait(10)
-    return driver.find_element(AppiumBy.ID, test_id)
-
-
-def type_into(driver, test_id, text):
-    field = by_id(driver, test_id)
-    field.clear()
-    field.send_keys(text)
 
 
 def sign_in(driver):

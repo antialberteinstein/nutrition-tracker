@@ -16,9 +16,24 @@ _config = load_config()
 TEST_EMAIL = _config["testEmail"]  # confirmed on the cloud project, no profile yet
 TEST_PASSWORD = _config["testPassword"]
 TEST_DOMAIN = TEST_EMAIL.rsplit("@", 1)[1]
+# The cloud project rejects reserved domains such as .test (email_address_invalid), so sign-ups
+# need a deliverable address; "{ts}" is replaced with a timestamp to keep each run unique.
+SIGNUP_EMAIL = _config.get("signupEmail") or f"e2e-new-{{ts}}@{TEST_DOMAIN}"
 
 
 def by_id(driver, test_id):
+    """Find by testID, scrolling the screen until it is visible (UiAutomator2 skips off-screen
+    nodes, and the auth, profile and goals forms can be taller than a phone screen)."""
+    driver.implicitly_wait(0)
+    try:
+        if not driver.find_elements(AppiumBy.ID, test_id):
+            driver.find_elements(
+                AppiumBy.ANDROID_UIAUTOMATOR,
+                "new UiScrollable(new UiSelector().scrollable(true))"
+                f'.scrollIntoView(new UiSelector().resourceId("{test_id}"))',
+            )
+    finally:
+        driver.implicitly_wait(10)
     return driver.find_element(AppiumBy.ID, test_id)
 
 
@@ -43,7 +58,7 @@ def test_register_new_email_shows_check_email(driver):
     """TC-E2E-01 · ACC-01: a new email goes to 'Kiểm tra email' and does not enter the app."""
     go_to_login(driver)
     by_id(driver, "login-register").click()
-    type_into(driver, "register-email", f"e2e-new-{int(time.time())}@{TEST_DOMAIN}")
+    type_into(driver, "register-email", SIGNUP_EMAIL.format(ts=int(time.time())))
     type_into(driver, "register-password", "12345678")
     type_into(driver, "register-confirm", "12345678")
     by_id(driver, "register-submit").click()
