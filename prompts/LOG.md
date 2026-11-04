@@ -102,3 +102,11 @@ Mẫu một mục:
   - Không áp dụng cho PR của Dependabot.
   - Push lên nhánh PR (không phải `main`) không cần hỏi, vì cần cho việc sửa và giải quyết xung đột. Check CI còn chạy thì chờ; đỏ thì sửa hoặc chạy lại một lần, vẫn đỏ thì báo người dùng.
 - **Kết quả:** PR `docs/claude-pr-review-automerge`.
+
+## 2026-11-04 · Không cần hỏi với PR
+- **Yêu cầu:** Trong dự án này, PR không cần hỏi ý kiến chủ dự án. PR #6 và #24 đã được chủ dự án tự merge. Quy tắc review và merge tự động áp dụng cho các PR từ nay về sau.
+- **Quyết định:**
+  - Không thêm bước hỏi riêng cho PR đụng spec, ADR hay CLAUDE.md (gợi ý của reviewer bị từ chối).
+  - Bỏ "mở PR" khỏi danh sách phải hỏi.
+  - Xung đột trên spec đã duyệt hoặc ADR "Chấp nhận" mà không gộp được bằng cách giữ cả hai phía thì vẫn dừng lại hỏi (bước 5, mục "Review và merge PR" trong CLAUDE.md).
+- **Kết quả:** PR `docs/claude-pr-no-ask`.

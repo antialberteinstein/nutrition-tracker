@@ -111,7 +111,7 @@ npx expo install <pkg>   # luôn dùng thay cho npm install để có phiên b�
 - **Spec là của người dùng:** `docs/RequirementsOutline.md`, `docs/modules/`, ý tưởng thô ở `docs/spec-inbox.md`. Agent đề xuất, người dùng duyệt; không tự sửa spec đã duyệt.
 - Mọi thay đổi đi qua issue → nhánh → PR → CI. Chỉ ghi `Closes #N` khi đã xác minh; còn phần chưa xác minh thì dùng `Refs #N`.
 - **Lưu prompt dựng dự án vào `prompts/LOG.md`.** Mỗi yêu cầu của người dùng dẫn tới thay đổi trong repo (spec, thiết kế, kiến trúc, code, sửa lỗi, phát hành) được ghi một mục: ngày · lệnh hoặc ngữ cảnh · yêu cầu (rút gọn, giữ ý định) · quyết định đã chốt · issue/PR. Ghi trong cùng PR với thay đổi; chỉ thêm mục mới, không sửa mục cũ. Không ghi secret, token, URL môi trường thật hay dữ liệu cá nhân.
-- Hỏi người dùng trước khi push lên `main`, mở PR, gắn tag, release, deploy, publish, tạo issue, hoặc chạy lệnh lên môi trường thật (kể cả `npx supabase db push` và deploy Edge Function). **Merge PR do agent mở thì không cần hỏi**, theo mục "Review và merge PR" bên dưới.
+- Hỏi người dùng trước khi push lên `main`, gắn tag, release, deploy, publish, tạo issue, hoặc chạy lệnh lên môi trường thật (kể cả `npx supabase db push` và deploy Edge Function). **Mở và merge PR thì không cần hỏi**, kể cả PR đụng spec, ADR hay CLAUDE.md, theo mục "Review và merge PR" bên dưới. Nội dung thay đổi spec vẫn phải được người dùng duyệt trước, như dòng "Spec là của người dùng" ở trên; chỉ bước mở và merge PR là không cần hỏi.
 - Luôn áp dụng các skill trong mục "Skill bổ trợ". Việc lớn hoặc nhiều file thì trình kế hoạch trước.
 
 ### Review và merge PR (chủ dự án uỷ quyền ngày 2026-11-04)
