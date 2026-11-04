@@ -145,6 +145,16 @@ Mẫu một mục:
   - Ngưỡng đường tính theo mục tiêu calo đang dùng.
 - **Kết quả:** PR `feat/10-nutrition-domain`.
 
+## 2026-11-04 · `/kessie-skills:proj build #7 -> #15` — #11 Theme "Vở ô ly"
+- **Yêu cầu:** Issue #11: token Material 3 từ bảng màu vở (sáng/tối, tắt Dynamic Color), thang chữ, spacing, cột lề 40 dp, icon tab thật.
+- **Quyết định:**
+  - Màu lề đỏ `#D9473F` chỉ dùng làm đồ hoạ (tương phản 4.1:1); chữ "Vượt" dùng màu `error` `#B3261E` (6.3:1).
+  - Màu từng chất: đạm `#2E6E50`, natri `#8A5A00`, đường `#8E2F6E`; calo dùng màu chính.
+  - Giao diện tối: nền `#17141F`, mực tím nhạt `#CDBDFF`.
+  - Icon dùng Material Symbols (`menu_book`, `bar_chart`, `settings`) và SF Symbols tương ứng; dấu "!" ở lề dùng `expo-symbols`, không dùng ký tự Unicode.
+  - Test tự động kiểm độ tương phản WCAG của bảng màu.
+- **Kết quả:** PR `feat/11-notebook-theme`.
+
 ## 2026-11-04 · `/kessie-skills:proj build #7 -> #15` — #15 Dữ liệu ghi món
 - **Yêu cầu:** Issue #15: bảng `meal_entries` và `foods`, RPC `log_meal`, truy vấn gợi ý, chuẩn hoá tên món, kèm test.
 - **Quyết định:**
