@@ -8,7 +8,7 @@ import {
 
 import OnboardingScreen from "@/app/onboarding";
 
-const mockMutateAsync = jest.fn<() => Promise<{ ok: true }>>();
+const mockMutateAsync = jest.fn<(profile: unknown) => Promise<{ ok: true }>>();
 
 jest.mock("expo-router", () => ({ useFocusEffect: () => undefined }));
 jest.mock("react-native-safe-area-context", () => {
