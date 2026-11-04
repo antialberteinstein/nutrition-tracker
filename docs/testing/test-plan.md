@@ -22,17 +22,22 @@
   - Node LTS;
   - JDK 17 và Android SDK (để build APK);
   - Appium 2 cùng driver `uiautomator2`;
-  - `uv`;
-  - Docker (cho Supabase local).
-- **Backend:** Supabase local (`supabase start`) với tài khoản test được seed sẵn (đã xác nhận email). App debug đọc URL và key từ `.env.e2e`. **Không chạy E2E trên project cloud chứa dữ liệu thật.**
-  - Chạy `npx supabase db reset` trước mỗi lượt E2E: các test Onboarding tạo hồ sơ cho `e2e-a`, nên lượt sau cần dữ liệu seed sạch.
+  - `uv`.
+
+  Không cần Docker cho E2E (ADR-015).
+- **Backend:** project Supabase cloud, với một tài khoản test do chủ dự án tạo trên dashboard (Authentication → Add user, tự xác nhận email). App debug đọc URL và anon key của project cloud từ `.env.e2e`.
+  - Mỗi tài khoản chỉ đi qua Onboarding được một lần (không có policy xoá hồ sơ). Sau một lượt đạt, tạo tài khoản mới (ví dụ `testuser002@…`) và sửa `testEmail` trong `config.json`.
+  - E2E chỉ kiểm được schema đã `db push` lên cloud.
+  - TC-E2E-01 và TC-E2E-07 gửi email thật; nếu lỗi vì giới hạn email của Supabase thì ghi rõ trong báo cáo.
 - **Cấu hình máy test:** `e2e/mobile-appium/config.json` (**không commit**; có trong `.gitignore`). Mẫu nằm ở `config.example.json`:
   ```json
   {
     "udid": "<UDID máy test>",
     "appiumServer": "http://127.0.0.1:4723",
     "apkPath": "build/app-debug.apk",
-    "appPackage": "<package Android>"
+    "appPackage": "<package Android>",
+    "testEmail": "<email tài khoản test trên cloud>",
+    "testPassword": "<mật khẩu tài khoản test>"
   }
   ```
 - **Kết nối Metro:** máy test cắm USB. `run-metro.sh` chạy Metro ở cổng 8081; `run-test.sh` tự làm `adb reverse tcp:8081 tcp:8081` để APK debug tải được JS bundle. Lệnh `adb` chỉ nằm **trong script**.

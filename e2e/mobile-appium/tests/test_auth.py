@@ -1,4 +1,5 @@
-"""Account E2E (issue #12). Requires Supabase local with supabase/seed.sql (test-plan §3).
+"""Account E2E (issue #12). Runs against the Supabase cloud project with the confirmed test account
+from config.json (ADR-015, test-plan §3).
 
 The driver fixture installs the app once per session, so the first test starts signed out;
 every test that signs in signs out again before it ends.
@@ -9,8 +10,12 @@ import time
 import pytest
 from appium.webdriver.common.appiumby import AppiumBy
 
-SEED_EMAIL = "e2e-a@test.local"  # confirmed, no profile yet
-SEED_PASSWORD = "E2e-local-only-1"  # local-only synthetic password (supabase/seed.sql)
+from conftest import load_config
+
+_config = load_config()
+TEST_EMAIL = _config["testEmail"]  # confirmed on the cloud project, no profile yet
+TEST_PASSWORD = _config["testPassword"]
+TEST_DOMAIN = TEST_EMAIL.rsplit("@", 1)[1]
 
 
 def by_id(driver, test_id):
@@ -38,7 +43,7 @@ def test_register_new_email_shows_check_email(driver):
     """TC-E2E-01 · ACC-01: a new email goes to 'Kiểm tra email' and does not enter the app."""
     go_to_login(driver)
     by_id(driver, "login-register").click()
-    type_into(driver, "register-email", f"e2e-new-{int(time.time())}@test.local")
+    type_into(driver, "register-email", f"e2e-new-{int(time.time())}@{TEST_DOMAIN}")
     type_into(driver, "register-password", "12345678")
     type_into(driver, "register-confirm", "12345678")
     by_id(driver, "register-submit").click()
@@ -50,7 +55,7 @@ def test_register_invalid_input(driver):
     """TC-E2E-02 · ACC-02: existing email, short password and mismatched passwords are rejected."""
     go_to_login(driver)
     by_id(driver, "login-register").click()
-    type_into(driver, "register-email", SEED_EMAIL)
+    type_into(driver, "register-email", TEST_EMAIL)
     type_into(driver, "register-password", "1234567")
     type_into(driver, "register-confirm", "7654321")
     by_id(driver, "register-submit").click()
@@ -60,14 +65,14 @@ def test_register_invalid_input(driver):
     type_into(driver, "register-confirm", "12345678")
     by_id(driver, "register-submit").click()
     assert "đã được đăng ký" in by_id(driver, "register-email-error").text
-    assert by_id(driver, "register-email").text == SEED_EMAIL  # typed data is kept
+    assert by_id(driver, "register-email").text == TEST_EMAIL  # typed data is kept
     driver.back()
 
 
 def test_wrong_password(driver):
     """TC-E2E-03 · ACC-03: wrong password shows one generic message."""
     go_to_login(driver)
-    type_into(driver, "login-email", SEED_EMAIL)
+    type_into(driver, "login-email", TEST_EMAIL)
     type_into(driver, "login-password", "wrong-password")
     by_id(driver, "login-submit").click()
     assert by_id(driver, "login-error").text == "Email hoặc mật khẩu không đúng"
@@ -76,7 +81,7 @@ def test_wrong_password(driver):
 def test_forgot_password_same_message(driver):
     """TC-E2E-07 · ACC-09: unknown and known emails get the same confirmation."""
     messages = []
-    for email in ("nobody-here@test.local", SEED_EMAIL):
+    for email in (f"nobody-here@{TEST_DOMAIN}", TEST_EMAIL):
         # Open the screen fresh each time so the second read waits for the second response.
         go_to_login(driver)
         by_id(driver, "login-forgot").click()
@@ -91,15 +96,15 @@ def test_forgot_password_same_message(driver):
 def test_sign_in_then_sign_out(driver, config):
     """TC-E2E-19 · ACC-04, ACC-10: first sign-in lands on onboarding; sign-out returns to login for good."""
     go_to_login(driver)
-    type_into(driver, "login-email", SEED_EMAIL)
-    type_into(driver, "login-password", SEED_PASSWORD)
+    type_into(driver, "login-email", TEST_EMAIL)
+    type_into(driver, "login-password", TEST_PASSWORD)
     by_id(driver, "login-submit").click()
     if driver.find_elements(AppiumBy.ID, "screen-today"):
         driver.find_element(
             AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Cài đặt")'
         ).click()
         by_id(driver, "settings-signout").click()
-        pytest.skip("e2e-a already has a profile: run `npx supabase db reset` first")
+        pytest.skip("the test account already has a profile: create a new one (test-plan §3)")
     assert by_id(driver, "screen-onboarding").is_displayed()
     by_id(driver, "onboarding-signout").click()
     assert by_id(driver, "screen-login").is_displayed()

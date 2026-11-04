@@ -1,6 +1,7 @@
 """Shared Appium fixtures for the mobile E2E suite (ADR-012, docs/testing/test-plan.md).
 
-- Reads the device config from config.json (gitignored; copy config.example.json).
+- Reads the device config and the cloud test account from config.json (gitignored; copy
+  config.example.json). E2E runs against the Supabase cloud project (ADR-015).
 - Creates one UiAutomator2 session per test session.
 - Before every test, brings the app under test to the foreground and fails fast if it is not there,
   so a test never runs against another app.
@@ -31,7 +32,7 @@ def load_config() -> dict:
             returncode=2,
         )
     config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
-    for key in ("udid", "appiumServer", "apkPath", "appPackage"):
+    for key in ("udid", "appiumServer", "apkPath", "appPackage", "testEmail", "testPassword"):
         if not config.get(key):
             pytest.exit(f"config.json is missing '{key}'.", returncode=2)
     return config
