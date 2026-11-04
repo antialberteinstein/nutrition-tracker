@@ -27,14 +27,34 @@ def by_id(driver, test_id):
     driver.implicitly_wait(0)
     try:
         if not driver.find_elements(AppiumBy.ID, test_id):
-            driver.find_elements(
-                AppiumBy.ANDROID_UIAUTOMATOR,
-                "new UiScrollable(new UiSelector().scrollable(true))"
-                f'.scrollIntoView(new UiSelector().resourceId("{test_id}"))',
-            )
+            scroll_to(driver, test_id)
     finally:
         driver.implicitly_wait(10)
     return driver.find_element(AppiumBy.ID, test_id)
+
+
+def scroll_to(driver, test_id):
+    """Scroll the screen's scroll view until the testID is on screen; no-op if there is none."""
+    driver.find_elements(
+        AppiumBy.ANDROID_UIAUTOMATOR,
+        "new UiScrollable(new UiSelector().scrollable(true))"
+        f'.scrollIntoView(new UiSelector().resourceId("{test_id}"))',
+    )
+    _wait_until_still(driver, test_id)
+
+
+def _wait_until_still(driver, test_id, timeout=3.0):
+    """After a scroll, wait until the element stops moving: a tap during the fling only stops the
+    ScrollView and never reaches the button (seen with "Đăng xuất" at the end of onboarding)."""
+    deadline = time.time() + timeout
+    last = None
+    while time.time() < deadline:
+        found = driver.find_elements(AppiumBy.ID, test_id)
+        rect = found[0].rect if found else None
+        if rect is not None and rect == last:
+            return
+        last = rect
+        time.sleep(0.3)
 
 
 def type_into(driver, test_id, text):

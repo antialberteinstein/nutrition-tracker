@@ -10,7 +10,7 @@ import pytest
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.support.ui import WebDriverWait
 
-from test_auth import TEST_EMAIL, TEST_PASSWORD, by_id, go_to_login, type_into
+from test_auth import TEST_EMAIL, TEST_PASSWORD, by_id, go_to_login, scroll_to, type_into
 
 YEAR = datetime.date.today().year
 
@@ -40,8 +40,15 @@ def absent(test_id):
 
 
 def submit_is(enabled):
+    """'Tiếp tục' sits below the form, off screen at first; scroll to it before reading its state."""
     want = "true" if enabled else "false"
-    return lambda d: d.find_element(AppiumBy.ID, "profile-submit").get_attribute("enabled") == want
+
+    def check(d):
+        if not d.find_elements(AppiumBy.ID, "profile-submit"):
+            scroll_to(d, "profile-submit")
+        return d.find_element(AppiumBy.ID, "profile-submit").get_attribute("enabled") == want
+
+    return check
 
 
 def expect_field_error(driver, test_id, value, shown):

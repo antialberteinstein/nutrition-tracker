@@ -228,4 +228,7 @@ Mẫu một mục:
   - `npx supabase db push --remote` (CLI 3 mặc định trỏ vào local), sau `--dry-run`: áp dụng hai migration, không có seed. Ghi `--remote` vào CLAUDE.md, README, WORKFLOW.
   - Sửa "Unmatched Route" khi chưa đăng nhập: `routeState` trả thêm đích `redirect` (`/login`, `/reset-password`, `/onboarding`, `/`), mọi `Stack.Protected` dùng `redirectTo`. Nhóm `(auth)` dùng `anchor` thay cho `initialRouteName` (đã bị loại bỏ, gây LogBox).
   - E2E: bật `disableIdLocatorAutocompletion` (testID của RN là resource-id không có tiền tố package); chờ màn đầu tiên tối đa 90 giây khi mở lần đầu; `by_id` dùng chung và tự cuộn; email đăng ký mới cấu hình được (`signupEmail`) vì cloud từ chối domain `.test`.
+  - "Đăng xuất" ở Onboarding không ăn sau luồng Đăng ký: thanh LogBox của cảnh báo supabase-js "WebCrypto API is not supported" (PKCE rơi về `plain`) phủ lên nút. Ẩn đúng cảnh báo đó trong LogBox (chỉ bản dev); chuyển PKCE sang S256 cần `expo-crypto` (module native), đề xuất làm riêng.
+  - Test cuộn tới nút trước khi đọc trạng thái hoặc bấm, và chờ cuộn dừng hẳn.
+  - Kết quả trên máy thật (Supabase cloud): 7/7 test không gửi email đạt; TC-E2E-01 và TC-E2E-07 chưa chạy (cần địa chỉ email nhận được thư).
 - **Kết quả:** PR `fix/12-unmatched-route`.
