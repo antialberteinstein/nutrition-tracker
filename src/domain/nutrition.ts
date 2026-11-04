@@ -87,10 +87,15 @@ export function defaultCalorieAdjustment(goal: GoalType): number {
   return DEFAULT_ADJUSTMENT[goal];
 }
 
-/** BMI rounded to 1 decimal, as displayed. */
+/**
+ * BMI rounded half-up to 1 decimal, as displayed.
+ * Computed in integers (weight in 0.1 kg, height in cm) so values like 18.75 round to 18.8;
+ * the floating-point `kg / (m * m)` form rounds some of them down.
+ */
 export function bmi(weightKg: number, heightCm: number): number {
-  const m = heightCm / 100;
-  return Math.round((weightKg / (m * m)) * 10) / 10;
+  const numerator = Math.round(weightKg * 10) * 10000; // BMI * 10 = w10 * 10000 / cm^2
+  const denominator = heightCm * heightCm;
+  return Math.floor((2 * numerator + denominator) / (2 * denominator)) / 10;
 }
 
 /** Asia-Pacific cut-offs, applied to the displayed (1-decimal) BMI. */
@@ -121,6 +126,11 @@ function nutrient(
     : { lower, suggested, target: suggested, upper, isCustom: false };
 }
 
+/**
+ * Inputs are expected to be valid (zod schemas + DB constraints, ADR-004); no guards here.
+ * W3 and W5 compare against the displayed (rounded) BMR and bounds, so a warning never
+ * contradicts the numbers on screen.
+ */
 export function computeTargets(
   profile: Profile,
   overrides: GoalOverrides,
