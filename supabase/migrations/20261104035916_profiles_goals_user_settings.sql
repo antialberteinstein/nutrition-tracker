@@ -1,7 +1,7 @@
 -- Issue #9: profiles, goals, user_settings (Account.md §5, Goals.md §5, Reminders.md §5; ADR-003).
 -- Every row belongs to exactly one user; RLS restricts all access to the owner.
 
--- Shared trigger: server-assigned updated_at.
+-- Shared trigger: updated_at is always server-assigned (insert and update); clients cannot set it.
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
@@ -9,6 +9,22 @@ set search_path = ''
 as $$
 begin
   new.updated_at := now();
+  return new;
+end;
+$$;
+
+-- created_at is server-assigned on insert and immutable on update.
+create or replace function public.keep_created_at()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  if tg_op = 'INSERT' then
+    new.created_at := now();
+  else
+    new.created_at := old.created_at;
+  end if;
   return new;
 end;
 $$;
@@ -48,8 +64,12 @@ create trigger profiles_check_age
   before insert or update of birth_year on public.profiles
   for each row execute function public.check_profile_age();
 
+create trigger profiles_keep_created_at
+  before insert or update on public.profiles
+  for each row execute function public.keep_created_at();
+
 create trigger profiles_set_updated_at
-  before update on public.profiles
+  before insert or update on public.profiles
   for each row execute function public.set_updated_at();
 
 -- ------------------------------------------------------------------- goals
@@ -65,7 +85,7 @@ create table public.goals (
 );
 
 create trigger goals_set_updated_at
-  before update on public.goals
+  before insert or update on public.goals
   for each row execute function public.set_updated_at();
 
 -- ----------------------------------------------------------- user_settings
@@ -83,7 +103,7 @@ create table public.user_settings (
 );
 
 create trigger user_settings_set_updated_at
-  before update on public.user_settings
+  before insert or update on public.user_settings
   for each row execute function public.set_updated_at();
 
 -- --------------------------------------------------------------------- RLS
@@ -114,4 +134,10 @@ create policy "user_settings: owner can insert" on public.user_settings
 create policy "user_settings: owner can update" on public.user_settings
   for update to authenticated using ((select auth.uid()) = user_id)
   with check ((select auth.uid()) = user_id);
--- No delete policies: rows are removed only by the auth.users cascade (account deletion, #21).
+
+-- ------------------------------------------------------------------ grants
+-- Explicit privileges (do not rely on Supabase's default public-schema grants):
+-- anon gets nothing; authenticated gets select/insert/update only. There is no delete:
+-- rows are removed only by the auth.users cascade (account deletion, #21).
+revoke all on public.profiles, public.goals, public.user_settings from anon, authenticated;
+grant select, insert, update on public.profiles, public.goals, public.user_settings to authenticated;

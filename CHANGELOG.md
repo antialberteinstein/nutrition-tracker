@@ -7,6 +7,7 @@ Mọi thay đổi đáng chú ý của Nutrition Tracker được ghi tại đâ
 ## [Unreleased]
 
 ### Thêm
+- Dữ liệu hồ sơ, mục tiêu và cài đặt nhắc nhở trên Supabase; mỗi tài khoản chỉ đọc/ghi được dữ liệu của mình ([#9](https://github.com/antialberteinstein/nutrition-tracker/issues/9)).
 - Nền app: client Supabase với phiên được mã hoá (khoá trong SecureStore), TanStack Query (mutation không tự retry), seed hai tài khoản E2E cho Supabase local ([#8](https://github.com/antialberteinstein/nutrition-tracker/issues/8)).
 
 ### Bảo trì
