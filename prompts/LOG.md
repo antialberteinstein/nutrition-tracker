@@ -108,5 +108,5 @@ Mẫu một mục:
 - **Quyết định:**
   - Không thêm bước hỏi riêng cho PR đụng spec, ADR hay CLAUDE.md (gợi ý của reviewer bị từ chối).
   - Bỏ "mở PR" khỏi danh sách phải hỏi.
-  - Xung đột về nội dung spec hoặc ADR vẫn dừng lại theo bước 5.
+  - Xung đột trên spec đã duyệt hoặc ADR "Chấp nhận" mà không gộp được bằng cách giữ cả hai phía thì vẫn dừng lại hỏi (bước 5, mục "Review và merge PR" trong CLAUDE.md).
 - **Kết quả:** PR `docs/claude-pr-no-ask`.
