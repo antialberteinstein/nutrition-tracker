@@ -78,3 +78,8 @@ Mẫu một mục:
   - `eslint.config.js` do `expo lint` sinh; Prettier dùng cấu hình mặc định (hook config-protection chặn tạo file cấu hình riêng).
   - Supabase CLI là devDependency (`npx supabase`).
 - **Kết quả:** commit `chore: scaffold repository foundation`.
+
+## 2026-11-04 · `/kessie-skills:proj plan`
+- **Yêu cầu:** Lên kế hoạch milestone 0.1.0 từ các AC đã duyệt.
+- **Quyết định:** Duyệt 17 issue theo thứ tự nền → lõi → giao diện → tích hợp → kiểm tra trên thiết bị → phát hành. Luồng mỏng đi trước: tài khoản → onboarding → ghi món → Hôm nay. Viết 2 prompt giai đoạn. Milestone 0.2.0 (Workout) để plan sau.
+- **Kết quả:** milestone `0.1.0`, issue #7–#23; `prompts/01-foundation.txt`, `prompts/02-meal-log.txt`.
