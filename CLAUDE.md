@@ -98,7 +98,7 @@ npx expo install <pkg>   # luôn dùng thay cho npm install để có phiên b�
   - biểu đồ để trống, không vẽ 0, cho ngày chưa ghi.
 - Supabase CLI chạy qua `npx supabase` (devDependency), không cài global.
 - Build Android thường cần JDK 17; máy dev có thể đang dùng JDK khác.
-- Icon tab hiện là placeholder của template Expo.
+- Icon tab dùng Material Symbols qua `NativeTabs.Trigger.Icon md=…` (iOS: `sf=…`); tên symbol phải có trong `expo-symbols/build/android/symbols.json`.
 
 ## Phiên bản và phát hành
 

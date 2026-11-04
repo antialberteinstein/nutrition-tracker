@@ -29,13 +29,15 @@ export function NotebookPage({
 
 export type MarginMark = "alert";
 
-type MarginRowProps = ViewProps & {
-  children: ReactNode;
-  /** Status mark drawn inside the margin column (never in the content). */
-  mark?: MarginMark | null;
-  /** Spoken label for the mark, e.g. "Vượt ngưỡng". Required when `mark` is set. */
-  markLabel?: string;
-};
+type MarginRowProps = ViewProps & { children: ReactNode } & (
+    | {
+        /** Status mark drawn inside the margin column (never in the content). */
+        mark: MarginMark;
+        /** Spoken label for the mark, e.g. "Vượt ngưỡng" (required so TalkBack can name it). */
+        markLabel: string;
+      }
+    | { mark?: null; markLabel?: never }
+  );
 
 /** A row whose status mark sits in the margin column, aligned with the row's first line. */
 export function MarginRow({
@@ -80,6 +82,7 @@ const styles = StyleSheet.create({
     opacity: 0.45,
   },
   row: { flexDirection: "row", alignItems: "flex-start" },
+  // paddingTop 2 centres the 20 dp icon on a Body (24 dp) first line; pass style for other variants.
   gutter: { width: layout.marginColumn, alignItems: "center", paddingTop: 2 },
   content: { flex: 1, paddingRight: 16 },
 });

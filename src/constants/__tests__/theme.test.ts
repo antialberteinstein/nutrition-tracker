@@ -39,17 +39,17 @@ describe("Vở ô ly palette contrast (WCAG)", () => {
   it.each(schemes)("%s: nutrient hues are readable as text (≥ 4.5:1)", (s) => {
     for (const hue of Object.values(nutrientColors[s])) {
       expect(contrast(hue, palettes[s].background)).toBeGreaterThanOrEqual(4.5);
+      expect(
+        contrast(hue, palettes[s].surfaceContainer),
+      ).toBeGreaterThanOrEqual(4.5);
     }
   });
 
-  it.each(schemes)(
-    "%s: margin rule and outline are visible graphics (≥ 3:1)",
-    (s) => {
-      const p = palettes[s];
-      expect(contrast(p.margin, p.background)).toBeGreaterThanOrEqual(3);
-      expect(contrast(p.outline, p.background)).toBeGreaterThanOrEqual(3);
-    },
-  );
+  // The red margin rule is decorative (drawn at 45% opacity), so it has no contrast requirement.
+  it.each(schemes)("%s: outline is a visible UI boundary (≥ 3:1)", (s) => {
+    const p = palettes[s];
+    expect(contrast(p.outline, p.background)).toBeGreaterThanOrEqual(3);
+  });
 
   it("onPrimary is readable on primary", () => {
     for (const s of schemes) {
