@@ -212,13 +212,20 @@ describe("edge cases (review of PR #30)", () => {
   it("W6 for lose switches exactly at BMI 18.5", () => {
     const lose = { ...MALE, heightCm: 160 };
     expect(run({ ...lose, weightKg: 47.1 }).bmi).toBe(18.4);
-    expect(run({ ...lose, weightKg: 47.1 }).warnings).toContainEqual({ code: "W6", field: "goalType" });
+    expect(run({ ...lose, weightKg: 47.1 }).warnings).toContainEqual({
+      code: "W6",
+      field: "goalType",
+    });
     expect(run({ ...lose, weightKg: 47.4 }).bmi).toBe(18.5);
-    expect(run({ ...lose, weightKg: 47.4 }).warnings.map((w) => w.code)).not.toContain("W6");
+    expect(
+      run({ ...lose, weightKg: 47.4 }).warnings.map((w) => w.code),
+    ).not.toContain("W6");
   });
 
   it("calorie target exactly 4000 has no W4", () => {
-    expect(run(MALE, { calorieTarget: 4000 }).warnings.map((w) => w.code)).not.toContain("W4");
+    expect(
+      run(MALE, { calorieTarget: 4000 }).warnings.map((w) => w.code),
+    ).not.toContain("W4");
   });
 
   it("example 2 full sugar bounds and safe line", () => {
@@ -228,7 +235,10 @@ describe("edge cases (review of PR #30)", () => {
   });
 
   it("sodium below 500 → W5; sugar exactly at its upper bound → no W5", () => {
-    expect(run(MALE, { sodiumTargetMg: 499 }).warnings).toContainEqual({ code: "W5", field: "sodiumTargetMg" });
+    expect(run(MALE, { sodiumTargetMg: 499 }).warnings).toContainEqual({
+      code: "W5",
+      field: "sodiumTargetMg",
+    });
     expect(run(MALE, { sugarTargetG: 51 }).warnings).toEqual([]);
   });
 });
