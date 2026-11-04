@@ -25,22 +25,29 @@ updates:
           - "jest-expo"
           - "@types/react"
     ignore:
-      # Major versions of SDK-pinned packages only move with an Expo SDK upgrade.
-      - dependency-name: "expo*"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "@expo/*"
-        update-types: ["version-update:semver-major"]
+      # Expo SDK 58 pins these; `npx expo install --check` must stay clean (issue #7).
+      # Upgrade them only with an SDK bump PR using `npx expo install --fix`.
+      # Exact-pinned by the SDK: ignore every update.
       - dependency-name: "react"
-        update-types: ["version-update:semver-major"]
       - dependency-name: "react-dom"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "react-native*"
-        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-native"
+      - dependency-name: "react-native-*"
       - dependency-name: "@react-native/*"
-        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react"
+      # Expo packages: patch updates within the SDK line are fine; minor/major come with an SDK bump.
+      - dependency-name: "expo"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      - dependency-name: "expo-*"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      - dependency-name: "@expo/*"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
       - dependency-name: "jest-expo"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      # Tooling majors the SDK does not support yet (TypeScript ~6.0 pinned; eslint-config-expo on ESLint 9).
+      - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
-
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: uv
     directory: /e2e/mobile-appium
     schedule:
