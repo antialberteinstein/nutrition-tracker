@@ -8,6 +8,8 @@ Mọi thay đổi đáng chú ý của Nutrition Tracker được ghi tại đâ
 
 ### Thêm
 - Giao diện "Vở ô ly" trên Material 3: bảng màu sáng/tối riêng (tắt Dynamic Color), màu cố định cho từng chất, thang chữ, cột lề đỏ, icon tab Hôm nay · Biểu đồ · Cài đặt ([#11](https://github.com/antialberteinstein/nutrition-tracker/issues/11)).
+
+- Dữ liệu ghi món: lưu món đã ăn và món đã lưu trong một giao dịch, gửi lại không ghi trùng; gợi ý món không phân biệt dấu ("bun nam" khớp "Bún nạm"), tối đa 5 gợi ý ([#15](https://github.com/antialberteinstein/nutrition-tracker/issues/15)).
 - Dữ liệu hồ sơ, mục tiêu và cài đặt nhắc nhở trên Supabase; mỗi tài khoản chỉ đọc/ghi được dữ liệu của mình ([#9](https://github.com/antialberteinstein/nutrition-tracker/issues/9)).
 - Tính toán dinh dưỡng: BMI (chuẩn châu Á – Thái Bình Dương), BMR Mifflin-St Jeor, TDEE, mục tiêu và ngưỡng cho calo, đạm, natri, đường, cảnh báo W1–W6 ([#10](https://github.com/antialberteinstein/nutrition-tracker/issues/10)).
 - Nền app: client Supabase với phiên được mã hoá (khoá trong SecureStore), TanStack Query (mutation không tự retry), seed hai tài khoản E2E cho Supabase local ([#8](https://github.com/antialberteinstein/nutrition-tracker/issues/8)).
