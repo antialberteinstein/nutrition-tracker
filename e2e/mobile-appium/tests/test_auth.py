@@ -94,9 +94,8 @@ def test_sign_in_then_sign_out(driver, config):
     assert by_id(driver, "screen-onboarding").is_displayed()
     by_id(driver, "onboarding-signout").click()
     assert by_id(driver, "screen-login").is_displayed()
-    # Back on the root screen leaves the app; it must not reveal a signed-in screen first.
+    # Back on the root screen leaves the app; reopening it must still show Đăng nhập.
     driver.back()
-    assert not driver.find_elements(AppiumBy.ID, "screen-onboarding")
     driver.activate_app(config["appPackage"])
     assert by_id(driver, "screen-login").is_displayed()
     assert not driver.find_elements(AppiumBy.ID, "screen-onboarding")

@@ -22,9 +22,11 @@ import { useTheme } from "@/hooks/use-theme";
 import { createQueryClient } from "@/lib/query-client";
 
 /**
- * Session-based routing (Account.md §3.1, see routeState). Stack.Protected removes unreachable
- * screens, so Back can never return to them (ACC-10), and when the focused screen loses its guard
- * the stack moves to the first screen still available: no imperative redirects are needed.
+ * Session-based routing (Account.md §3.1, see routeState). A guarded screen that gains focus
+ * redirects to the first unguarded route in filesystem sort order (groups first), not declaration
+ * order, so Back can never land on it (ACC-10). Every routeState therefore leaves exactly one
+ * destination open (signed out: (auth) sorts before auth/callback); keep it that way when adding
+ * states, or the destination will depend on file names.
  */
 function RootNavigator() {
   const { session, initializing, recovering } = useAuth();

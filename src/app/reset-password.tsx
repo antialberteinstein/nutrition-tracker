@@ -7,6 +7,7 @@ import { FormScreen } from "@/components/form-screen";
 import {
   newPasswordSchema,
   type NewPasswordValues,
+  signOut,
   updatePassword,
 } from "@/features/auth/auth";
 
@@ -74,6 +75,12 @@ export default function ResetPasswordScreen() {
         onPress={onSubmit}
         loading={isSubmitting}
         testID="reset-submit"
+      />
+      <Button
+        label="Huỷ và đăng xuất"
+        variant="text"
+        onPress={() => void signOut()}
+        testID="reset-signout"
       />
     </FormScreen>
   );
