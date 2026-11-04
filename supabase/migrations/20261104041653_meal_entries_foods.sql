@@ -9,7 +9,7 @@ language sql
 stable
 set search_path = ''
 as $$
-  select regexp_replace(lower(extensions.unaccent(normalize(btrim(p_name), NFC))), '\s+', ' ', 'g');
+  select btrim(regexp_replace(lower(extensions.unaccent(normalize(p_name, NFC))), '\s+', ' ', 'g'));
 $$;
 
 -- Display name: trim + collapse whitespace, case and diacritics kept.
@@ -19,7 +19,7 @@ language sql
 immutable
 set search_path = ''
 as $$
-  select regexp_replace(btrim(p_name), '\s+', ' ', 'g');
+  select btrim(regexp_replace(p_name, '\s+', ' ', 'g'));
 $$;
 
 -- ------------------------------------------------------------ meal_entries
@@ -90,7 +90,7 @@ end;
 $$;
 
 create trigger foods_set_name_normalized
-  before insert or update of name on public.foods
+  before insert or update on public.foods
   for each row execute function public.set_food_name_normalized();
 
 -- --------------------------------------------------------------------- RLS
@@ -141,29 +141,45 @@ as $$
 declare
   v_name text := public.clean_food_name(p_name);
   v_row public.meal_entries;
+  v_inserted boolean := false;
 begin
   if auth.uid() is null then
     raise exception 'not authenticated' using errcode = '42501';
   end if;
+  -- Validate before the numeric(4,1)/smallint casts, which would silently round or overflow.
+  if p_calories_kcal is null or p_calories_kcal not between 0 and 5000
+     or p_protein_g is null or p_protein_g <> round(p_protein_g, 1)
+     or p_sugar_g is null or p_sugar_g <> round(p_sugar_g, 1) then
+    raise exception 'invalid nutrition values' using errcode = '23514';
+  end if;
 
   select * into v_row from public.meal_entries where id = p_id;
 
-  if found
-     and (v_row.eaten_on, v_row.name, v_row.calories_kcal, v_row.protein_g, v_row.sodium_mg, v_row.sugar_g)
-         is not distinct from (p_eaten_on, v_name, p_calories_kcal::smallint, p_protein_g, p_sodium_mg, p_sugar_g)
-  then
-    return v_row;
+  if not found then
+    insert into public.meal_entries (id, eaten_on, name, calories_kcal, protein_g, sodium_mg, sugar_g)
+    values (p_id, p_eaten_on, v_name, p_calories_kcal, p_protein_g, p_sodium_mg, p_sugar_g)
+    on conflict (id) do nothing
+    returning * into v_row;
+    v_inserted := found;
+    if not v_inserted then
+      -- Same id inserted concurrently (a retry racing the first request), or an id we cannot see.
+      select * into v_row from public.meal_entries where id = p_id;
+      if not found then
+        raise exception 'meal id already in use' using errcode = '23505';
+      end if;
+    end if;
   end if;
 
-  if found then
+  if not v_inserted then
+    if (v_row.eaten_on, v_row.name, v_row.calories_kcal, v_row.protein_g, v_row.sodium_mg, v_row.sugar_g)
+       is not distinct from (p_eaten_on, v_name, p_calories_kcal::smallint, p_protein_g, p_sodium_mg, p_sugar_g)
+    then
+      return v_row; -- MEAL-17: identical retry, not another use
+    end if;
     update public.meal_entries
        set eaten_on = p_eaten_on, name = v_name, calories_kcal = p_calories_kcal,
            protein_g = p_protein_g, sodium_mg = p_sodium_mg, sugar_g = p_sugar_g
      where id = p_id
-    returning * into v_row;
-  else
-    insert into public.meal_entries (id, eaten_on, name, calories_kcal, protein_g, sodium_mg, sugar_g)
-    values (p_id, p_eaten_on, v_name, p_calories_kcal, p_protein_g, p_sodium_mg, p_sugar_g)
     returning * into v_row;
   end if;
 
@@ -199,7 +215,7 @@ as $$
     from public.foods f, q
    where q.pattern <> ''
      and f.name_normalized like '%' || q.pattern || '%'
-   order by (f.name_normalized like q.pattern || '%') desc, f.last_used_at desc
+   order by (f.name_normalized like q.pattern || '%') desc, f.last_used_at desc, f.name_normalized
    limit 5;
 $$;
 
@@ -207,3 +223,7 @@ revoke all on function public.log_meal(uuid, date, text, integer, numeric, integ
 grant execute on function public.log_meal(uuid, date, text, integer, numeric, integer, numeric) to authenticated;
 revoke all on function public.suggest_foods(text) from public, anon;
 grant execute on function public.suggest_foods(text) to authenticated;
+revoke all on function public.normalize_food_name(text) from public, anon;
+grant execute on function public.normalize_food_name(text) to authenticated;
+revoke all on function public.clean_food_name(text) from public, anon;
+grant execute on function public.clean_food_name(text) to authenticated;

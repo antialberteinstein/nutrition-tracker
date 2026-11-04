@@ -12,6 +12,7 @@ describe("food-name (mirrors public.normalize_food_name)", () => {
     ["Đậu phụ", "dau phu"],
     ["Cà phê sữa đá", "ca phe sua da"],
     ["Bún nạm", "bun nam"],
+    ["\tbun\nnam ", "bun nam"], // tabs and newlines
     ["Bún nạm", "bun nam"], // decomposed input (NFD)
   ])("normalize(%j) = %j", (input, expected) => {
     expect(normalizeFoodName(input)).toBe(expected);

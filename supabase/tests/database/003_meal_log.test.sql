@@ -3,10 +3,12 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(26);
+select plan(32);
 
 select is(public.normalize_food_name('  Bún  NẠM '), 'bun nam', 'normalize: diacritics, case, whitespace');
 select is(public.normalize_food_name('Đậu phụ'), 'dau phu', 'normalize: đ → d');
+select is(public.normalize_food_name(E'\tbun\nnam '), 'bun nam', 'normalize: tabs and newlines');
+select is(public.clean_food_name(E'Phở\n'), 'Phở', 'clean: trailing newline is removed');
 
 insert into auth.users (id, aud, role, email) values
   ('00000000-0000-4000-c000-00000000000a', 'authenticated', 'authenticated', 'meal-a@test.local'),
@@ -56,6 +58,10 @@ select throws_ok(
   $$ select public.log_meal(gen_random_uuid(), current_date, '   ', 400, 20, 1500, 3) $$,
   '23514', null, 'an empty name is rejected'
 );
+select throws_ok(
+  $$ select public.log_meal(gen_random_uuid(), current_date, 'Phở', 400, 1.25, 1500, 3) $$,
+  '23514', null, 'MEAL-10: protein with two decimals is rejected, not rounded'
+);
 
 select results_eq($$ select name from public.suggest_foods('bun') $$, $$ values ('bún NẠM'::text) $$,
   'MEAL-03: "bun" suggests Bún nạm');
@@ -98,12 +104,30 @@ select throws_ok(
   '23505', null, 'B cannot overwrite A''s entry by reusing its id'
 );
 delete from public.meal_entries where user_id = '00000000-0000-4000-c000-00000000000a';
+update public.meal_entries set calories_kcal = 1 where user_id = '00000000-0000-4000-c000-00000000000a';
+update public.foods set calories_kcal = 1 where user_id = '00000000-0000-4000-c000-00000000000a';
+delete from public.foods where user_id = '00000000-0000-4000-c000-00000000000a';
 
 reset role;
 select is(
   (select count(*)::int from public.meal_entries where user_id = '00000000-0000-4000-c000-00000000000a'),
   9,
   'MEAL-15: B''s delete did not remove A''s entries'
+);
+select is(
+  (select calories_kcal::int from public.meal_entries where id = '10000000-0000-4000-c000-000000000001'),
+  450,
+  'MEAL-15: B''s update did not change A''s entry'
+);
+select is(
+  (select count(*)::int from public.foods where user_id = '00000000-0000-4000-c000-00000000000a'),
+  8,
+  'MEAL-15: B''s delete did not remove A''s saved foods'
+);
+select is(
+  (select count(*)::int from public.foods where user_id = '00000000-0000-4000-c000-00000000000a' and calories_kcal = 1),
+  0,
+  'MEAL-15: B''s update did not change A''s saved foods'
 );
 
 -- ------------------------------------------------------------ anon

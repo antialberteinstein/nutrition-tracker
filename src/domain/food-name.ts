@@ -1,6 +1,8 @@
 /**
  * Food-name helpers (MealLog.md §4). The server function public.normalize_food_name is the
  * source of truth for matching and uniqueness; this mirrors it for client-side checks.
+ * Parity is guaranteed for Vietnamese text and ASCII whitespace; outside that (e.g. ł, ø, ß, which
+ * unaccent maps but NFD does not), always trust the server value.
  */
 
 export const FOOD_NAME_MAX = 100;
