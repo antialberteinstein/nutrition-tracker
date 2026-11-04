@@ -87,3 +87,18 @@ Mẫu một mục:
 - **Yêu cầu:** Push 2 commit đầu lên GitHub; bật bảo vệ `main` khi CI xanh; thêm plugin chính chủ của Expo vào bảng "Skill bổ trợ".
 - **Quyết định:** Thêm `expo@claude-plugins-official` vào bảng (chỉ gợi ý lệnh cài, không tự cài). Bảo vệ `main`: bắt buộc PR và hai check CI, cấm force-push, không bắt buộc reviewer.
 - **Kết quả:** PR `docs/claude-expo-skill`.
+
+## 2026-11-04 · Quy tắc review và merge PR tự động
+- **Yêu cầu:** Thêm vào CLAUDE.md:
+  - mỗi khi mở PR mới, tạo sub-agent gọi skill `kessie-skills:pr-review` để review;
+  - sau đó tự merge hoặc tự giải quyết xung đột, không cần hỏi;
+  - luôn pull lại `main` ở local sau khi merge;
+  - nếu không gọi được skill thì báo người dùng.
+- **Quyết định:**
+  - Chỉ merge khi không còn phát hiện chặn và CI bắt buộc xanh; không dùng `--admin`.
+  - Không gọi được skill thì báo người dùng và không merge.
+  - Xung đột đụng spec hoặc ADR đã duyệt thì hỏi.
+  - Tag, release, deploy, migration lên cloud vẫn phải hỏi.
+  - Không áp dụng cho PR của Dependabot.
+  - Push lên nhánh PR (không phải `main`) không cần hỏi, vì cần cho việc sửa và giải quyết xung đột. Check CI còn chạy thì chờ; đỏ thì sửa hoặc chạy lại một lần, vẫn đỏ thì báo người dùng.
+- **Kết quả:** PR `docs/claude-pr-review-automerge`.
