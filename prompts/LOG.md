@@ -127,3 +127,12 @@ Mẫu một mục:
   - Auto-refresh token chỉ chạy khi app ở foreground.
   - CI thêm bước `supabase db reset` để nạp seed; có test pgTAP kiểm tra seed.
 - **Kết quả:** PR `feat/8-app-foundation`.
+
+## 2026-11-04 · `/kessie-skills:proj build #7 -> #15` — #10 Logic dinh dưỡng
+- **Yêu cầu:** Issue #10: module thuần tính BMI, BMR, TDEE, mục tiêu, ngưỡng và cảnh báo W1–W6, kèm unit test theo các ví dụ trong spec.
+- **Quyết định:**
+  - BMI làm tròn 1 chữ số và phân loại trên chính giá trị đã làm tròn (để khớp với số người dùng thấy).
+  - Đường an toàn = round(BMR chưa làm tròn + 300).
+  - W3 so mục tiêu với BMR đã làm tròn.
+  - Ngưỡng đường tính theo mục tiêu calo đang dùng.
+- **Kết quả:** PR `feat/10-nutrition-domain`.

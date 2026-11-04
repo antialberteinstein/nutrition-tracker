@@ -7,6 +7,7 @@ Mọi thay đổi đáng chú ý của Nutrition Tracker được ghi tại đâ
 ## [Unreleased]
 
 ### Thêm
+- Tính toán dinh dưỡng: BMI (chuẩn châu Á – Thái Bình Dương), BMR Mifflin-St Jeor, TDEE, mục tiêu và ngưỡng cho calo, đạm, natri, đường, cảnh báo W1–W6 ([#10](https://github.com/antialberteinstein/nutrition-tracker/issues/10)).
 - Nền app: client Supabase với phiên được mã hoá (khoá trong SecureStore), TanStack Query (mutation không tự retry), seed hai tài khoản E2E cho Supabase local ([#8](https://github.com/antialberteinstein/nutrition-tracker/issues/8)).
 
 ### Bảo trì

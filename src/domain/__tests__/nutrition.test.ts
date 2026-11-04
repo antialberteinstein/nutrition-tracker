@@ -35,10 +35,31 @@ describe("computeTargets — spec examples (GOAL-01)", () => {
     const t = computeTargets(MALE, {}, opts);
     expect(t.bmr).toBe(1649);
     expect(t.tdee).toBe(2556);
-    expect(t.calories).toMatchObject({ suggested: 2056, target: 2056, bmr: 1649, safe: 1949, upper: 4000 });
-    expect(t.protein).toMatchObject({ lower: 56, suggested: 112, target: 112, upper: 154 });
-    expect(t.sodium).toMatchObject({ lower: 500, suggested: 1500, target: 1500, upper: 2000 });
-    expect(t.sugar).toMatchObject({ lower: 0, suggested: 26, target: 26, upper: 51 });
+    expect(t.calories).toMatchObject({
+      suggested: 2056,
+      target: 2056,
+      bmr: 1649,
+      safe: 1949,
+      upper: 4000,
+    });
+    expect(t.protein).toMatchObject({
+      lower: 56,
+      suggested: 112,
+      target: 112,
+      upper: 154,
+    });
+    expect(t.sodium).toMatchObject({
+      lower: 500,
+      suggested: 1500,
+      target: 1500,
+      upper: 2000,
+    });
+    expect(t.sugar).toMatchObject({
+      lower: 0,
+      suggested: 26,
+      target: 26,
+      upper: 51,
+    });
     expect(t.bmi).toBe(22.9);
     expect(t.bmiCategory).toBe("normal");
   });
@@ -54,7 +75,8 @@ describe("computeTargets — spec examples (GOAL-01)", () => {
 
   it("GOAL-02: a new account has no custom targets", () => {
     const t = run(MALE);
-    for (const n of [t.calories, t.protein, t.sodium, t.sugar]) expect(n.isCustom).toBe(false);
+    for (const n of [t.calories, t.protein, t.sodium, t.sugar])
+      expect(n.isCustom).toBe(false);
     expect(t.warnings).toEqual([]);
   });
 });
@@ -70,17 +92,26 @@ describe("calorie adjustment and warnings W1/W2 (GOAL-03..05, GOAL-11)", () => {
   it("GOAL-03: lose with +1 → W1 and target = round(TDEE) + 1", () => {
     const t = run(MALE, { calorieAdjustment: 1 });
     expect(t.calories.target).toBe(2557);
-    expect(t.warnings).toContainEqual({ code: "W1", field: "calorieAdjustment" });
+    expect(t.warnings).toContainEqual({
+      code: "W1",
+      field: "calorieAdjustment",
+    });
   });
 
   it("GOAL-04: gain with −1 → W2", () => {
     const t = run({ ...MALE, goalType: "gain" }, { calorieAdjustment: -1 });
-    expect(t.warnings).toContainEqual({ code: "W2", field: "calorieAdjustment" });
+    expect(t.warnings).toContainEqual({
+      code: "W2",
+      field: "calorieAdjustment",
+    });
   });
 
   it("GOAL-05: adjustment 0 never triggers W1/W2", () => {
     for (const goalType of ["lose", "gain"] as const) {
-      const codes = run({ ...MALE, goalType }, { calorieAdjustment: 0 }).warnings.map((w) => w.code);
+      const codes = run(
+        { ...MALE, goalType },
+        { calorieAdjustment: 0 },
+      ).warnings.map((w) => w.code);
       expect(codes).not.toContain("W1");
       expect(codes).not.toContain("W2");
     }
@@ -89,13 +120,25 @@ describe("calorie adjustment and warnings W1/W2 (GOAL-03..05, GOAL-11)", () => {
 
 describe("custom targets and W3–W5 (GOAL-06, 07, 09)", () => {
   it("GOAL-06: custom calories below BMR → W3, above 4000 → W4", () => {
-    expect(run(MALE, { calorieTarget: 1648 }).warnings).toContainEqual({ code: "W3", field: "calorieTarget" });
-    expect(run(MALE, { calorieTarget: 1649 }).warnings.map((w) => w.code)).not.toContain("W3");
-    expect(run(MALE, { calorieTarget: 4001 }).warnings).toContainEqual({ code: "W4", field: "calorieTarget" });
+    expect(run(MALE, { calorieTarget: 1648 }).warnings).toContainEqual({
+      code: "W3",
+      field: "calorieTarget",
+    });
+    expect(
+      run(MALE, { calorieTarget: 1649 }).warnings.map((w) => w.code),
+    ).not.toContain("W3");
+    expect(run(MALE, { calorieTarget: 4001 }).warnings).toContainEqual({
+      code: "W4",
+      field: "calorieTarget",
+    });
   });
 
   it("GOAL-07: nutrient targets outside [lower, upper] → W5 on that field", () => {
-    const t = run(MALE, { proteinTargetG: 155, sodiumTargetMg: 2001, sugarTargetG: 52 });
+    const t = run(MALE, {
+      proteinTargetG: 155,
+      sodiumTargetMg: 2001,
+      sugarTargetG: 52,
+    });
     expect(t.warnings).toEqual(
       expect.arrayContaining([
         { code: "W5", field: "proteinTargetG" },
@@ -103,7 +146,10 @@ describe("custom targets and W3–W5 (GOAL-06, 07, 09)", () => {
         { code: "W5", field: "sugarTargetG" },
       ]),
     );
-    expect(run(MALE, { proteinTargetG: 55 }).warnings).toContainEqual({ code: "W5", field: "proteinTargetG" });
+    expect(run(MALE, { proteinTargetG: 55 }).warnings).toContainEqual({
+      code: "W5",
+      field: "proteinTargetG",
+    });
     expect(run(MALE, { proteinTargetG: 154 }).warnings).toEqual([]);
   });
 
@@ -134,8 +180,13 @@ describe("BMI category and W6 (GOAL-12, GOAL-16)", () => {
 
   it("GOAL-16: gain at BMI 25.0 → W6, at 24.9 → no W6", () => {
     const gain = { ...MALE, goalType: "gain" as const, heightCm: 160 };
-    expect(run({ ...gain, weightKg: 64.0 }).warnings).toContainEqual({ code: "W6", field: "goalType" });
-    expect(run({ ...gain, weightKg: 63.7 }).warnings.map((w) => w.code)).not.toContain("W6");
+    expect(run({ ...gain, weightKg: 64.0 }).warnings).toContainEqual({
+      code: "W6",
+      field: "goalType",
+    });
+    expect(
+      run({ ...gain, weightKg: 63.7 }).warnings.map((w) => w.code),
+    ).not.toContain("W6");
   });
 });
 

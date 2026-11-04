@@ -4,7 +4,8 @@
  */
 
 export type Sex = "male" | "female";
-export type ActivityLevel = "sedentary" | "light" | "moderate" | "active" | "very_active";
+export type ActivityLevel =
+  "sedentary" | "light" | "moderate" | "active" | "very_active";
 export type GoalType = "lose" | "maintain" | "gain";
 export type BmiCategory = "underweight" | "normal" | "overweight" | "obese";
 
@@ -76,7 +77,11 @@ export const CALORIE_UPPER = 4000;
 export const SAFE_MARGIN = 300;
 export const SODIUM = { lower: 500, suggested: 1500, upper: 2000 } as const;
 
-const DEFAULT_ADJUSTMENT: Record<GoalType, number> = { lose: -500, maintain: 0, gain: 300 };
+const DEFAULT_ADJUSTMENT: Record<GoalType, number> = {
+  lose: -500,
+  maintain: 0,
+  gain: 300,
+};
 
 export function defaultCalorieAdjustment(goal: GoalType): number {
   return DEFAULT_ADJUSTMENT[goal];
@@ -102,9 +107,15 @@ export function bmrExact(p: Profile, age: number): number {
   return p.sex === "male" ? base + 5 : base - 161;
 }
 
-const isSet = (v: number | null | undefined): v is number => v !== null && v !== undefined;
+const isSet = (v: number | null | undefined): v is number =>
+  v !== null && v !== undefined;
 
-function nutrient(lower: number, suggested: number, upper: number, custom?: number | null): NutrientTarget {
+function nutrient(
+  lower: number,
+  suggested: number,
+  upper: number,
+  custom?: number | null,
+): NutrientTarget {
   return isSet(custom)
     ? { lower, suggested, target: custom, upper, isCustom: true }
     : { lower, suggested, target: suggested, upper, isCustom: false };
@@ -118,7 +129,9 @@ export function computeTargets(
   const age = options.currentYear - profile.birthYear;
   const bmiValue = bmi(profile.weightKg, profile.heightCm);
   const exactBmr = bmrExact(profile, age);
-  const factor = options.workoutEnabled ? WORKOUT_ACTIVITY_FACTOR : ACTIVITY_FACTOR[profile.activityLevel];
+  const factor = options.workoutEnabled
+    ? WORKOUT_ACTIVITY_FACTOR
+    : ACTIVITY_FACTOR[profile.activityLevel];
   const tdee = Math.round(exactBmr * factor);
   const bmr = Math.round(exactBmr);
 
@@ -127,7 +140,9 @@ export function computeTargets(
     ? overrides.calorieAdjustment
     : defaultCalorieAdjustment(profile.goalType);
   const suggestedCalories = tdee + adjustment;
-  const calorieTarget = isSet(overrides.calorieTarget) ? overrides.calorieTarget : suggestedCalories;
+  const calorieTarget = isSet(overrides.calorieTarget)
+    ? overrides.calorieTarget
+    : suggestedCalories;
 
   const calories: CalorieTarget = {
     bmr,
@@ -143,7 +158,12 @@ export function computeTargets(
     Math.round(2.2 * profile.weightKg),
     overrides.proteinTargetG,
   );
-  const sodium = nutrient(SODIUM.lower, SODIUM.suggested, SODIUM.upper, overrides.sodiumTargetMg);
+  const sodium = nutrient(
+    SODIUM.lower,
+    SODIUM.suggested,
+    SODIUM.upper,
+    overrides.sodiumTargetMg,
+  );
   // Sugar bounds follow the calorie target in use (custom if set): 5% / 10% of kcal, 4 kcal per g.
   const sugar = nutrient(
     0,
@@ -153,15 +173,23 @@ export function computeTargets(
   );
 
   const warnings: Warning[] = [];
-  if (profile.goalType === "lose" && adjustment >= 1) warnings.push({ code: "W1", field: "calorieAdjustment" });
-  if (profile.goalType === "gain" && adjustment <= -1) warnings.push({ code: "W2", field: "calorieAdjustment" });
-  if (calorieTarget < bmr) warnings.push({ code: "W3", field: "calorieTarget" });
-  if (calorieTarget > CALORIE_UPPER) warnings.push({ code: "W4", field: "calorieTarget" });
-  const outside = (n: NutrientTarget) => n.target < n.lower || n.target > n.upper;
+  if (profile.goalType === "lose" && adjustment >= 1)
+    warnings.push({ code: "W1", field: "calorieAdjustment" });
+  if (profile.goalType === "gain" && adjustment <= -1)
+    warnings.push({ code: "W2", field: "calorieAdjustment" });
+  if (calorieTarget < bmr)
+    warnings.push({ code: "W3", field: "calorieTarget" });
+  if (calorieTarget > CALORIE_UPPER)
+    warnings.push({ code: "W4", field: "calorieTarget" });
+  const outside = (n: NutrientTarget) =>
+    n.target < n.lower || n.target > n.upper;
   if (outside(protein)) warnings.push({ code: "W5", field: "proteinTargetG" });
   if (outside(sodium)) warnings.push({ code: "W5", field: "sodiumTargetMg" });
   if (outside(sugar)) warnings.push({ code: "W5", field: "sugarTargetG" });
-  if ((bmiValue < 18.5 && profile.goalType === "lose") || (bmiValue >= 25 && profile.goalType === "gain")) {
+  if (
+    (bmiValue < 18.5 && profile.goalType === "lose") ||
+    (bmiValue >= 25 && profile.goalType === "gain")
+  ) {
     warnings.push({ code: "W6", field: "goalType" });
   }
 
