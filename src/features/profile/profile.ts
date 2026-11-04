@@ -104,6 +104,36 @@ export function profileFormSchema(currentYear: number) {
   });
 }
 
+const FIELD_LABELS: Record<keyof ProfileFormValues, string> = {
+  weightKg: "Cân nặng",
+  heightCm: "Chiều cao",
+  sex: "Giới tính",
+  birthYear: "Năm sinh",
+  activityLevel: "Mức vận động",
+  goalType: "Mong muốn",
+};
+
+/** Labels of the fields still blank, in form order (ACC-05: say why "Tiếp tục" is locked). */
+export function missingProfileFields(v: Partial<ProfileFormValues>): string[] {
+  const order: (keyof ProfileFormValues)[] = [
+    "weightKg",
+    "heightCm",
+    "sex",
+    "birthYear",
+    "activityLevel",
+    "goalType",
+  ];
+  return order
+    .filter((k) => {
+      const value = v[k];
+      return (
+        value === undefined ||
+        (typeof value === "string" && value.trim() === "")
+      );
+    })
+    .map((k) => FIELD_LABELS[k]);
+}
+
 export type ProfileFormOutput = z.output<ReturnType<typeof profileFormSchema>>;
 
 export function toProfile(v: ProfileFormOutput): Profile {
@@ -119,7 +149,7 @@ export function toProfile(v: ProfileFormOutput): Profile {
 
 export function toFormValues(p: Profile): ProfileFormValues {
   return {
-    weightKg: String(p.weightKg),
+    weightKg: String(p.weightKg).replace(".", ","),
     heightCm: String(p.heightCm),
     birthYear: String(p.birthYear),
     sex: p.sex,
@@ -207,6 +237,8 @@ export function useSaveProfile() {
     mutationFn: saveProfile,
     onSuccess: async (result) => {
       if (!result.ok) return;
+      // The row exists now: move on even if the refetch below fails (network drop).
+      queryClient.setQueryData(profileExistsKey(userId), true);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: profileKey(userId) }),
         queryClient.invalidateQueries({ queryKey: profileExistsKey(userId) }),

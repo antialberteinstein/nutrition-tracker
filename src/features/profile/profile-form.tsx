@@ -1,14 +1,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 
 import { ChoiceGroup } from "@/components/choice-group";
 import { Button, FormError, TextField } from "@/components/form";
+import { ThemedText } from "@/components/themed-text";
 import type { Profile } from "@/domain/nutrition";
 import type { Result } from "@/features/auth/auth";
 import {
   ACTIVITY_OPTIONS,
   GOAL_OPTIONS,
+  missingProfileFields,
   profileFormSchema,
   type ProfileFormOutput,
   type ProfileFormValues,
@@ -45,8 +47,14 @@ export function ProfileForm({
   } = useForm<ProfileFormValues, unknown, ProfileFormOutput>({
     resolver: zodResolver(schema),
     defaultValues: initialValues,
-    mode: "onChange",
+    // Validate on blur too, so a text field left empty shows its error (ACC-05).
+    mode: "all",
   });
+
+  // Choice groups have no blur, so name every missing field next to the locked button.
+  const missing = missingProfileFields(
+    useWatch({ control }) as ProfileFormValues,
+  );
 
   useEffect(() => {
     onDirtyChange?.(isDirty);
@@ -151,6 +159,15 @@ export function ProfileForm({
         )}
       />
       <FormError message={formError} testID="profile-error" />
+      {missing.length > 0 ? (
+        <ThemedText
+          variant="bodySmall"
+          color="onSurfaceVariant"
+          testID="profile-missing"
+        >
+          {`Còn thiếu: ${missing.join(", ")}`}
+        </ThemedText>
+      ) : null}
       <Button
         label={submitLabel}
         onPress={() => void submit()}

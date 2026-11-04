@@ -8,6 +8,7 @@ import datetime
 
 import pytest
 from appium.webdriver.common.appiumby import AppiumBy
+from selenium.webdriver.support.ui import WebDriverWait
 
 from test_auth import SEED_EMAIL, SEED_PASSWORD, by_id, go_to_login, type_into
 
@@ -21,13 +22,36 @@ def sign_in(driver):
     by_id(driver, "login-submit").click()
 
 
-def submit_enabled(driver):
-    return by_id(driver, "profile-submit").get_attribute("enabled") == "true"
+def wait_until(driver, condition, timeout=5):
+    """Explicit wait with implicit waits off, so negative checks are fast and not racy."""
+    driver.implicitly_wait(0)
+    try:
+        return WebDriverWait(driver, timeout, poll_frequency=0.25).until(lambda d: condition(d))
+    finally:
+        driver.implicitly_wait(10)
 
 
-def field_error_shown(driver, test_id, value):
+def present(test_id):
+    return lambda d: bool(d.find_elements(AppiumBy.ID, test_id))
+
+
+def absent(test_id):
+    return lambda d: not d.find_elements(AppiumBy.ID, test_id)
+
+
+def submit_is(enabled):
+    want = "true" if enabled else "false"
+    return lambda d: d.find_element(AppiumBy.ID, "profile-submit").get_attribute("enabled") == want
+
+
+def expect_field_error(driver, test_id, value, shown):
     type_into(driver, test_id, value)
-    return bool(driver.find_elements(AppiumBy.ID, f"{test_id}-error"))
+    wait_until(driver, (present if shown else absent)(f"{test_id}-error"))
+
+
+def hide_keyboard(driver):
+    if driver.is_keyboard_shown():
+        driver.hide_keyboard()
 
 
 def by_text(driver, pattern):
@@ -35,6 +59,30 @@ def by_text(driver, pattern):
     return driver.find_element(
         AppiumBy.ANDROID_UIAUTOMATOR, f'new UiSelector().textMatches("(?iu){pattern}")'
     )
+
+
+@pytest.fixture(autouse=True)
+def back_to_login(driver):
+    """If a test fails midway, sign out so later files (test_smoke) start on Đăng nhập."""
+    yield
+    driver.implicitly_wait(0)
+    try:
+        for _ in range(4):
+            if driver.find_elements(AppiumBy.ID, "screen-login"):
+                return
+            for sign_out in ("onboarding-signout", "settings-signout"):
+                found = driver.find_elements(AppiumBy.ID, sign_out)
+                if found:
+                    found[0].click()
+                    break
+            else:
+                hide_keyboard(driver)
+                driver.back()
+                dialogs = driver.find_elements(AppiumBy.ID, "android:id/button1")
+                if dialogs and not driver.find_elements(AppiumBy.ID, "screen-onboarding"):
+                    dialogs[0].click()  # "Bỏ thay đổi" on a dirty Hồ sơ screen
+    finally:
+        driver.implicitly_wait(10)
 
 
 def sign_out_from_tabs(driver):
@@ -50,22 +98,25 @@ def test_onboarding_validation_then_save(driver):
         sign_out_from_tabs(driver)  # leave the app signed out for the tests that follow
         pytest.skip("e2e-a already has a profile: run `npx supabase db reset` first")
     assert by_id(driver, "screen-onboarding").is_displayed()
-    assert not submit_enabled(driver)
+    wait_until(driver, submit_is(False))
 
     for value in ("19.9", "300.1"):
-        assert field_error_shown(driver, "profile-weight", value), value
-    assert not field_error_shown(driver, "profile-weight", "70")
-    assert field_error_shown(driver, "profile-height", "99")
-    assert not field_error_shown(driver, "profile-height", "175")
+        expect_field_error(driver, "profile-weight", value, shown=True)
+    expect_field_error(driver, "profile-weight", "70", shown=False)
+    expect_field_error(driver, "profile-height", "99", shown=True)
+    expect_field_error(driver, "profile-height", "175", shown=False)
     for age in (12, 101):
-        assert field_error_shown(driver, "profile-birth-year", str(YEAR - age)), age
-    assert not field_error_shown(driver, "profile-birth-year", str(YEAR - 30))
+        expect_field_error(driver, "profile-birth-year", str(YEAR - age), shown=True)
+    expect_field_error(driver, "profile-birth-year", str(YEAR - 30), shown=False)
+    hide_keyboard(driver)
     by_id(driver, "profile-sex-male").click()
     by_id(driver, "profile-activity-moderate").click()
-    assert not submit_enabled(driver)  # goal still empty
+    # One field left blank: still locked, and the form says which one.
+    wait_until(driver, submit_is(False))
+    assert "Mong muốn" in by_id(driver, "profile-missing").text
 
     by_id(driver, "profile-goal-lose").click()
-    assert submit_enabled(driver)
+    wait_until(driver, submit_is(True))
     by_id(driver, "profile-submit").click()
     assert by_id(driver, "screen-today").is_displayed()
 
@@ -79,6 +130,7 @@ def test_profile_unsaved_changes_then_save(driver):
     assert by_id(driver, "screen-settings-profile").is_displayed()
 
     type_into(driver, "profile-weight", "72")
+    hide_keyboard(driver)  # with the keyboard open, Back only hides it (ACC-16)
     driver.back()
     by_text(driver, "Ở lại").click()
     assert by_id(driver, "screen-settings-profile").is_displayed()

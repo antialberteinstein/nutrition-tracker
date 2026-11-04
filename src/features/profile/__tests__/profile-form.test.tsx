@@ -53,6 +53,20 @@ describe("ProfileForm", () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
+  it("ACC-05: a blank field shows its error on blur and the missing fields are named", async () => {
+    await setup(jest.fn<Submit>());
+    expect(screen.getByTestId("profile-missing").props.children).toContain(
+      "Mong muốn",
+    );
+    await fireEvent(screen.getByTestId("profile-weight"), "blur");
+    expect(await screen.findByTestId("profile-weight-error")).toBeTruthy();
+
+    await fillValid();
+    await waitFor(() =>
+      expect(screen.queryByTestId("profile-missing")).toBeNull(),
+    );
+  });
+
   it("submits the parsed profile", async () => {
     const onSubmit = jest.fn<Submit>().mockResolvedValue({ ok: true });
     await setup(onSubmit);

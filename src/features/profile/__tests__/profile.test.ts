@@ -2,6 +2,7 @@ import { describe, expect, it, jest } from "@jest/globals";
 
 import {
   EMPTY_PROFILE_FORM,
+  missingProfileFields,
   profileFormSchema,
   type ProfileFormValues,
   saveFailureMessage,
@@ -87,6 +88,23 @@ describe("profileFormSchema (Account.md §4)", () => {
       goalType: "lose",
     });
     expect(toFormValues(profile)).toEqual(valid);
+  });
+});
+
+describe("missingProfileFields", () => {
+  it("ACC-05: names blank fields in form order", () => {
+    expect(missingProfileFields(valid)).toEqual([]);
+    expect(
+      missingProfileFields({ ...valid, heightCm: " ", goalType: undefined }),
+    ).toEqual(["Chiều cao", "Mong muốn"]);
+    expect(missingProfileFields(EMPTY_PROFILE_FORM)).toHaveLength(6);
+  });
+
+  it("shows a saved decimal weight with a comma", () => {
+    expect(
+      toFormValues({ ...toProfile(schema.parse(valid)), weightKg: 70.5 })
+        .weightKg,
+    ).toBe("70,5");
   });
 });
 
