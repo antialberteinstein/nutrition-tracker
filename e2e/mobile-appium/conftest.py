@@ -67,6 +67,8 @@ def _safe_name(nodeid: str) -> str:
 def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
+    # Fixtures can read item.rep_call to act only after a failed test.
+    setattr(item, f"rep_{report.when}", report)
     if report.when != "call" or not report.failed:
         return
     session = item.funcargs.get("driver")

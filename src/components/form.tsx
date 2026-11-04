@@ -94,6 +94,8 @@ type ButtonProps = {
   variant?: "filled" | "text";
   loading?: boolean;
   disabled?: boolean;
+  /** Called when a disabled button is tapped, e.g. to reveal why a form is locked. */
+  onPressWhileDisabled?: () => void;
   testID?: string;
 };
 
@@ -104,6 +106,7 @@ export function Button({
   variant = "filled",
   loading,
   disabled,
+  onPressWhileDisabled,
   testID,
 }: ButtonProps) {
   const { colors } = useTheme();
@@ -111,8 +114,12 @@ export function Button({
   const inactive = disabled || loading;
   return (
     <Pressable
-      onPress={onPress}
-      disabled={inactive}
+      onPress={disabled ? onPressWhileDisabled : onPress}
+      // Stays tappable while disabled only to explain itself; still announced as disabled.
+      // undefined (not false) so Pressable keeps accessibilityState.disabled.
+      disabled={
+        loading || (disabled && !onPressWhileDisabled) ? true : undefined
+      }
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ disabled: !!inactive, busy: !!loading }}

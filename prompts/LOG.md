@@ -173,3 +173,13 @@ Mẫu một mục:
   - Supabase local bật xác nhận email, mật khẩu tối thiểu 8 ký tự.
   - Testing Library v14: `fireEvent` cũng là async (đã ghi vào CLAUDE.md).
 - **Kết quả:** PR `feat/12-auth`.
+
+## 2026-11-04 · `tiếp tục` (`/kessie-skills:proj build #7 -> #15`) — #13 Onboarding và Hồ sơ
+- **Yêu cầu:** Làm #13: nhập hồ sơ lần đầu, sửa hồ sơ trong Cài đặt.
+- **Quyết định:**
+  - Một `ProfileForm` dùng chung cho Onboarding và Cài đặt › Hồ sơ, theo một schema zod. Số nhập dạng chữ, nhận dấu phẩy thập phân.
+  - Lưu hồ sơ bằng upsert theo `user_id`. Guard ở gốc tự chuyển từ Onboarding sang tab sau khi lưu; màn tóm tắt mục tiêu để #14 làm.
+  - Back trên Onboarding hỏi "Thoát app?". Rời Hồ sơ khi chưa lưu thì hỏi "Bỏ thay đổi?" (`usePreventRemove`).
+  - Tab Cài đặt thành stack (`settings/index`, `settings/profile`).
+  - E2E TC-E2E-04, 08; chạy `npx supabase db reset` trước mỗi lượt E2E (ghi trong test-plan). TC-E2E-05 cần màn tóm tắt nên làm cùng #14.
+- **Kết quả:** PR `feat/13-onboarding`.

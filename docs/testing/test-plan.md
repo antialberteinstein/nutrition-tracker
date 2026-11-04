@@ -25,6 +25,7 @@
   - `uv`;
   - Docker (cho Supabase local).
 - **Backend:** Supabase local (`supabase start`) với tài khoản test được seed sẵn (đã xác nhận email). App debug đọc URL và key từ `.env.e2e`. **Không chạy E2E trên project cloud chứa dữ liệu thật.**
+  - Chạy `npx supabase db reset` trước mỗi lượt E2E: các test Onboarding tạo hồ sơ cho `e2e-a`, nên lượt sau cần dữ liệu seed sạch.
 - **Cấu hình máy test:** `e2e/mobile-appium/config.json` (**không commit**; có trong `.gitignore`). Mẫu nằm ở `config.example.json`:
   ```json
   {

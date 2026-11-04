@@ -1,14 +1,22 @@
+import { useRouter } from "expo-router";
 import { useState } from "react";
 
 import { Button, FormError } from "@/components/form";
 import { FormScreen } from "@/components/form-screen";
+import { ListRow } from "@/components/list-row";
 import { ThemedText } from "@/components/themed-text";
 import { signOut } from "@/features/auth/auth";
 import { useAuth } from "@/features/auth/auth-provider";
+import { useProfile } from "@/features/profile/profile";
 
-/** Cài đặt. 0.1.0 adds Hồ sơ, Mục tiêu, Nhắc nhở, Món đã lưu, Xoá tài khoản in later issues. */
+/** Cài đặt. 0.1.0 adds Mục tiêu, Nhắc nhở, Món đã lưu, Xoá tài khoản in later issues. */
 export default function SettingsScreen() {
+  const router = useRouter();
   const { session } = useAuth();
+  const profile = useProfile();
+  const summary = profile.data
+    ? `${String(profile.data.weightKg).replace(".", ",")} kg · ${profile.data.heightCm} cm`
+    : undefined;
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -23,6 +31,12 @@ export default function SettingsScreen() {
 
   return (
     <FormScreen title="Cài đặt" testID="screen-settings">
+      <ListRow
+        label="Hồ sơ"
+        supporting={summary}
+        onPress={() => router.push("/settings/profile")}
+        testID="settings-profile"
+      />
       <ThemedText variant="titleMedium">Tài khoản</ThemedText>
       <ThemedText
         variant="body"
