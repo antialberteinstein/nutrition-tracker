@@ -72,18 +72,20 @@ def test_wrong_password(driver):
 
 def test_forgot_password_same_message(driver):
     """TC-E2E-07 · ACC-09: unknown and known emails get the same confirmation."""
-    go_to_login(driver)
-    by_id(driver, "login-forgot").click()
     messages = []
     for email in ("nobody-here@test.local", SEED_EMAIL):
+        # Open the screen fresh each time so the second read waits for the second response.
+        go_to_login(driver)
+        by_id(driver, "login-forgot").click()
+        assert not driver.find_elements(AppiumBy.ID, "forgot-sent")
         type_into(driver, "forgot-email", email)
         by_id(driver, "forgot-submit").click()
         messages.append(by_id(driver, "forgot-sent").text)
+        driver.back()
     assert messages[0] == messages[1]
-    driver.back()
 
 
-def test_sign_in_then_sign_out(driver):
+def test_sign_in_then_sign_out(driver, config):
     """TC-E2E-19 · ACC-04, ACC-10: first sign-in lands on onboarding; sign-out returns to login for good."""
     go_to_login(driver)
     type_into(driver, "login-email", SEED_EMAIL)
@@ -92,5 +94,9 @@ def test_sign_in_then_sign_out(driver):
     assert by_id(driver, "screen-onboarding").is_displayed()
     by_id(driver, "onboarding-signout").click()
     assert by_id(driver, "screen-login").is_displayed()
-    driver.back()  # Back must not return to a signed-in screen
+    # Back on the root screen leaves the app; it must not reveal a signed-in screen first.
+    driver.back()
+    assert not driver.find_elements(AppiumBy.ID, "screen-onboarding")
+    driver.activate_app(config["appPackage"])
+    assert by_id(driver, "screen-login").is_displayed()
     assert not driver.find_elements(AppiumBy.ID, "screen-onboarding")

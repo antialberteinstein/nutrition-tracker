@@ -15,22 +15,21 @@ export default function AuthCallbackScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ code?: string; next?: string }>();
   const { colors } = useTheme();
-  const { code, next } = parseAuthCallback(params);
+  const { code } = parseAuthCallback(params);
   const [exchangeFailed, setExchangeFailed] = useState(false);
 
   useEffect(() => {
     if (!code) return;
     let active = true;
     exchangeCode(code).then((result) => {
-      if (!active) return;
-      if (result.ok)
-        router.replace(next === "reset-password" ? "/reset-password" : "/");
-      else setExchangeFailed(true);
+      // On success the new session removes this screen and the root guards pick the destination
+      // (Đặt mật khẩu mới for a recovery link, onboarding or Hôm nay otherwise).
+      if (active && !result.ok) setExchangeFailed(true);
     });
     return () => {
       active = false;
     };
-  }, [code, next, router]);
+  }, [code]);
 
   const error =
     !code || exchangeFailed
@@ -45,6 +44,7 @@ export default function AuthCallbackScreen() {
           <Button
             label="Về đăng nhập"
             onPress={() => router.replace("/login")}
+            testID="callback-login"
           />
         </>
       ) : (

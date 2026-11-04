@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -11,9 +10,8 @@ import {
   updatePassword,
 } from "@/features/auth/auth";
 
-/** Opened from the recovery email (via /auth/callback, which already created a session). */
+/** Shown while a recovery session is active (password-recovery link → /auth/callback). */
 export default function ResetPasswordScreen() {
-  const router = useRouter();
   const [formError, setFormError] = useState<string | null>(null);
   const {
     control,
@@ -28,10 +26,8 @@ export default function ResetPasswordScreen() {
   const onSubmit = handleSubmit(async (values) => {
     setFormError(null);
     const result = await updatePassword(values);
-    if (result.ok) {
-      router.replace("/");
-      return;
-    }
+    // On success USER_UPDATED ends recovery and the root guards move on to the app.
+    if (result.ok) return;
     const { field, message } = result.failure;
     if (field === "password") setError("password", { message });
     else setFormError(message);

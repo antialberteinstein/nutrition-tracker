@@ -42,6 +42,8 @@ export type AuthFailure = {
   message: string;
   /** Set when the account exists but its email is not confirmed yet. */
   needsConfirmation?: boolean;
+  /** Set when the server could not be reached. */
+  network?: boolean;
 };
 
 const NETWORK_MESSAGE =
@@ -81,7 +83,7 @@ export function mapAuthError(
       };
   }
   if (!error || error.status === 0 || /network|fetch/i.test(error.message)) {
-    return { field: "form", message: NETWORK_MESSAGE };
+    return { field: "form", message: NETWORK_MESSAGE, network: true };
   }
   return { field: "form", message: "Đã có lỗi xảy ra, thử lại sau" };
 }
@@ -144,9 +146,7 @@ export async function requestPasswordReset({
     redirectTo: authRedirectUrl("reset-password"),
   });
   const failure = error ? mapAuthError(error) : null;
-  return failure && failure.message.startsWith("Không kết nối")
-    ? { ok: false, failure }
-    : ok;
+  return failure?.network ? { ok: false, failure } : ok;
 }
 
 export async function updatePassword({
@@ -156,8 +156,9 @@ export async function updatePassword({
   return error ? fail(error) : ok;
 }
 
+/** Signs out this device only; other devices keep their sessions. */
 export async function signOut(): Promise<Result> {
-  const { error } = await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut({ scope: "local" });
   return error ? fail(error) : ok;
 }
 

@@ -37,7 +37,7 @@ export default function CheckEmailScreen() {
       ) : null}
       <Button
         label="Về đăng nhập"
-        onPress={() => router.replace("/login")}
+        onPress={() => router.dismissTo("/login")}
         testID="check-email-login"
       />
     </FormScreen>

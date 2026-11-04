@@ -1,5 +1,5 @@
 import type { Session } from "@supabase/supabase-js";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createContext,
   type ReactNode,
@@ -10,33 +10,55 @@ import {
 
 import { supabase } from "@/lib/supabase";
 
-type AuthState = { session: Session | null; initializing: boolean };
+type AuthState = {
+  session: Session | null;
+  initializing: boolean;
+  /** Signed in from a password-recovery link; cleared once the new password is saved. */
+  recovering: boolean;
+};
 
-const AuthContext = createContext<AuthState>({
+const initialState: AuthState = {
   session: null,
   initializing: true,
-});
+  recovering: false,
+};
+
+const AuthContext = createContext<AuthState>(initialState);
 
 /** Holds the Supabase session and keeps it in sync with sign-in, sign-out and token refresh. */
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AuthState>({
-    session: null,
-    initializing: true,
-  });
+  const queryClient = useQueryClient();
+  const [state, setState] = useState<AuthState>(initialState);
 
   useEffect(() => {
     let active = true;
     supabase.auth.getSession().then(({ data }) => {
-      if (active) setState({ session: data.session, initializing: false });
+      if (active)
+        setState((s) =>
+          s.initializing
+            ? { ...s, session: data.session, initializing: false }
+            : s,
+        );
     });
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      setState({ session, initializing: false });
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      // Cached queries belong to the previous user; never show them to the next one.
+      if (event === "SIGNED_OUT") queryClient.clear();
+      setState((s) => ({
+        session,
+        initializing: false,
+        recovering:
+          event === "PASSWORD_RECOVERY"
+            ? true
+            : event === "USER_UPDATED" || event === "SIGNED_OUT"
+              ? false
+              : s.recovering,
+      }));
     });
     return () => {
       active = false;
       data.subscription.unsubscribe();
     };
-  }, []);
+  }, [queryClient]);
 
   return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>;
 }

@@ -8,29 +8,39 @@ import {
   View,
 } from "react-native";
 
+import { Button } from "@/components/form";
+import { ThemedText } from "@/components/themed-text";
+import { signOut } from "@/features/auth/auth";
 import {
   AuthProvider,
   useAuth,
   useHasProfile,
 } from "@/features/auth/auth-provider";
+import { profileCheck, routeState } from "@/features/auth/route-state";
+import { space } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { createQueryClient } from "@/lib/query-client";
 
 /**
- * Session-based routing (Account.md §3.1):
- * no session → (auth); session without profile → onboarding; session with profile → (tabs).
- * Stack.Protected removes unreachable screens, so Back can never return to them (ACC-10).
+ * Session-based routing (Account.md §3.1, see routeState). Stack.Protected removes unreachable
+ * screens, so Back can never return to them (ACC-10), and when the focused screen loses its guard
+ * the stack moves to the first screen still available: no imperative redirects are needed.
  */
 function RootNavigator() {
-  const { session, initializing } = useAuth();
+  const { session, initializing, recovering } = useAuth();
   const hasProfile = useHasProfile();
   const { colors } = useTheme();
 
-  const signedIn = !!session;
-  const profileKnown = !signedIn || hasProfile.isSuccess || hasProfile.isError;
-  if (initializing || !profileKnown) {
+  const state = routeState({
+    initializing,
+    signedIn: !!session,
+    recovering,
+    profile: profileCheck(hasProfile),
+  });
+
+  if (state.kind === "loading") {
     return (
-      <View style={[styles.splash, { backgroundColor: colors.background }]}>
+      <View style={[styles.center, { backgroundColor: colors.background }]}>
         <ActivityIndicator
           color={colors.primary}
           accessibilityLabel="Đang tải"
@@ -38,25 +48,53 @@ function RootNavigator() {
       </View>
     );
   }
-  // A failed profile check falls back to onboarding rather than a dead end; saving there will
-  // surface the network error to the user.
-  const onboarded = signedIn && hasProfile.data === true;
+  if (state.kind === "profile-error") {
+    return (
+      <View
+        style={[
+          styles.center,
+          styles.error,
+          { backgroundColor: colors.background },
+        ]}
+        testID="screen-profile-error"
+      >
+        <ThemedText variant="body" style={styles.errorText}>
+          Không tải được hồ sơ. Kiểm tra mạng rồi thử lại.
+        </ThemedText>
+        <Button
+          label="Thử lại"
+          onPress={() => void hasProfile.refetch()}
+          loading={hasProfile.isFetching}
+          testID="profile-error-retry"
+        />
+        <Button
+          label="Đăng xuất"
+          variant="text"
+          onPress={() => void signOut()}
+          testID="profile-error-signout"
+        />
+      </View>
+    );
+  }
 
+  const { guards } = state;
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={!signedIn}>
+      <Stack.Protected guard={guards.auth}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
-      <Stack.Protected guard={signedIn && !onboarded}>
-        <Stack.Screen name="onboarding" />
-      </Stack.Protected>
-      <Stack.Protected guard={onboarded}>
-        <Stack.Screen name="(tabs)" />
-      </Stack.Protected>
-      <Stack.Protected guard={signedIn}>
+      <Stack.Protected guard={guards.recovery}>
         <Stack.Screen name="reset-password" />
       </Stack.Protected>
-      <Stack.Screen name="auth/callback" />
+      <Stack.Protected guard={guards.onboarding}>
+        <Stack.Screen name="onboarding" />
+      </Stack.Protected>
+      <Stack.Protected guard={guards.tabs}>
+        <Stack.Screen name="(tabs)" />
+      </Stack.Protected>
+      <Stack.Protected guard={guards.callback}>
+        <Stack.Screen name="auth/callback" />
+      </Stack.Protected>
     </Stack>
   );
 }
@@ -76,5 +114,7 @@ export default function RootLayout() {
 }
 
 const styles = StyleSheet.create({
-  splash: { flex: 1, alignItems: "center", justifyContent: "center" },
+  center: { flex: 1, alignItems: "center", justifyContent: "center" },
+  error: { paddingHorizontal: space.l, gap: space.m },
+  errorText: { textAlign: "center" },
 });
