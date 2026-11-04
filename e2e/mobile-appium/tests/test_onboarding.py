@@ -76,6 +76,9 @@ def back_to_login(driver, request):
         for _ in range(4):
             if driver.find_elements(AppiumBy.ID, "screen-login"):
                 return
+            if driver.find_elements(AppiumBy.ID, "screen-today"):
+                sign_out_from_tabs(driver)  # Back on a tab root would background the app
+                continue
             for sign_out in ("onboarding-signout", "settings-signout"):
                 found = driver.find_elements(AppiumBy.ID, sign_out)
                 if found:

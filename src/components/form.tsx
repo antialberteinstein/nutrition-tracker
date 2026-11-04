@@ -131,6 +131,11 @@ export function Button({
         pressed && !inactive && { opacity: 0.85 },
       ]}
     >
+      {disabled && onPressWhileDisabled && !loading ? (
+        // Android makes a disabled view untouchable but keeps its children hit-testable, so a
+        // full-size native child lets a tap anywhere on the button reach onPressWhileDisabled.
+        <View collapsable={false} style={StyleSheet.absoluteFill} />
+      ) : null}
       {loading ? (
         <ActivityIndicator color={filled ? colors.onPrimary : colors.primary} />
       ) : (

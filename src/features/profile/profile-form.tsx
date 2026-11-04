@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
+import { AccessibilityInfo } from "react-native";
 
 import { ChoiceGroup } from "@/components/choice-group";
 import { Button, FormError, TextField } from "@/components/form";
@@ -162,7 +163,6 @@ export function ProfileForm({
         <ThemedText
           variant="bodySmall"
           color="onSurfaceVariant"
-          accessibilityLiveRegion="polite"
           testID="profile-missing"
         >
           {`Còn thiếu: ${missing.join(", ")}`}
@@ -173,7 +173,13 @@ export function ProfileForm({
         onPress={() => void submit()}
         disabled={!isValid}
         // ACC-05: tapping the locked button shows each field's error under that field.
-        onPressWhileDisabled={() => void trigger()}
+        onPressWhileDisabled={() => {
+          void trigger();
+          if (missing.length > 0)
+            AccessibilityInfo.announceForAccessibility(
+              `Còn thiếu: ${missing.join(", ")}`,
+            );
+        }}
         loading={isSubmitting}
         testID="profile-submit"
       />
