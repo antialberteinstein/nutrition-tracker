@@ -66,7 +66,6 @@ e2e/mobile-appium/scripts/run-test.sh    # E2E Appium trên thiết bị Android
 
 E2E chạy trên Supabase cloud với một tài khoản test đã xác nhận email (ADR-015), không cần Docker. Chép `.env.example` thành `.env.e2e` (đã gitignore) và điền URL cùng anon key của project cloud; `e2e/mobile-appium/scripts/run-metro.sh` sẽ nạp file này. Email và mật khẩu tài khoản test đặt trong `e2e/mobile-appium/config.json` (`testEmail`, `testPassword`).
 
-
 E2E cần `e2e/mobile-appium/config.json`: chép từ `config.example.json` và điền UDID của máy test và tài khoản test (file này không commit). Báo cáo nằm trong `reports/`, mỗi lần chạy ghi đè lần trước. Chi tiết ở [docs/testing/test-plan.md](docs/testing/test-plan.md).
 
 ## Cấu trúc

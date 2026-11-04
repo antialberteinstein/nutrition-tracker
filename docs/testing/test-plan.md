@@ -81,7 +81,7 @@ Khi gửi ảnh chụp vào issue hoặc PR, kiểm tra trước để không l�
 - Không sửa test cho "xanh" bằng cách nới điều kiện, trừ khi AC trong spec đã đổi.
 
 ## 7. Tiêu chí vào và ra cho mỗi release
-- **Vào:** CI xanh trên `main`; APK debug build được; Supabase local đã seed.
+- **Vào:** CI xanh trên `main`; APK debug build được; tài khoản test trên cloud chưa có hồ sơ và schema cloud đã `db push` (ADR-015).
 - **Ra:**
   - mọi `TC-E2E` của milestone đạt trên ít nhất một thiết bị thật;
   - mọi `TC-DEV` của milestone đã kiểm và ghi kết quả;
