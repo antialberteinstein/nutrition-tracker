@@ -111,8 +111,28 @@ npx expo install <pkg>   # luôn dùng thay cho npm install để có phiên b�
 - **Spec là của người dùng:** `docs/RequirementsOutline.md`, `docs/modules/`, ý tưởng thô ở `docs/spec-inbox.md`. Agent đề xuất, người dùng duyệt; không tự sửa spec đã duyệt.
 - Mọi thay đổi đi qua issue → nhánh → PR → CI. Chỉ ghi `Closes #N` khi đã xác minh; còn phần chưa xác minh thì dùng `Refs #N`.
 - **Lưu prompt dựng dự án vào `prompts/LOG.md`.** Mỗi yêu cầu của người dùng dẫn tới thay đổi trong repo (spec, thiết kế, kiến trúc, code, sửa lỗi, phát hành) được ghi một mục: ngày · lệnh hoặc ngữ cảnh · yêu cầu (rút gọn, giữ ý định) · quyết định đã chốt · issue/PR. Ghi trong cùng PR với thay đổi; chỉ thêm mục mới, không sửa mục cũ. Không ghi secret, token, URL môi trường thật hay dữ liệu cá nhân.
-- Hỏi người dùng trước khi push, mở PR, merge, gắn tag, release, deploy, publish, tạo issue, hoặc chạy lệnh lên môi trường thật.
+- Hỏi người dùng trước khi push lên `main`, mở PR, gắn tag, release, deploy, publish, tạo issue, hoặc chạy lệnh lên môi trường thật (kể cả `npx supabase db push` và deploy Edge Function). **Merge PR do agent mở thì không cần hỏi**, theo mục "Review và merge PR" bên dưới.
 - Luôn áp dụng các skill trong mục "Skill bổ trợ". Việc lớn hoặc nhiều file thì trình kế hoạch trước.
+
+### Review và merge PR (chủ dự án uỷ quyền ngày 2026-11-04)
+
+Áp dụng cho **mọi PR do agent mở**. PR của Dependabot xử lý theo `/kessie-skills:proj deps`.
+1. **Review bằng sub-agent:** ngay sau khi mở PR, tạo một sub-agent (tool Agent) và yêu cầu nó gọi skill **`kessie-skills:pr-review`** ở chế độ Code Review cho PR đó. Sub-agent trả về: có hay không có phát hiện chặn, kèm danh sách phát hiện. Sub-agent chỉ review, không sửa code.
+2. **Skill không gọi được** thì **báo người dùng** và không merge PR đó cho tới khi người dùng chỉ đạo. Các trường hợp này gồm:
+   - skill không có trong danh sách skill khả dụng;
+   - sub-agent không có tool Skill;
+   - skill lỗi.
+3. **Có phát hiện chặn:** sửa trên cùng nhánh, push, review lại bằng sub-agent mới.
+4. **Merge tự động, không cần hỏi** khi không còn phát hiện chặn **và** mọi check CI bắt buộc đều xanh:
+   - lệnh `gh pr merge <N> --merge --delete-branch`;
+   - **không** dùng `--admin` để vượt bảo vệ nhánh.
+5. **Xung đột với `main`: tự giải quyết, không cần hỏi.**
+   - Gộp `main` mới nhất vào nhánh PR rồi giải quyết xung đột.
+   - Với file chỉ thêm (`prompts/LOG.md`, CHANGELOG) thì giữ cả hai phía, theo thứ tự thời gian.
+   - Chạy lại kiểm tra, push, chờ CI xanh, rồi merge.
+   - Xung đột đụng tới spec đã duyệt hoặc ADR "Chấp nhận" mà không gộp được bằng cách giữ cả hai thì dừng lại và hỏi người dùng.
+6. **Sau mỗi lần merge, luôn cập nhật `main` ở local:** `git switch main && git pull --ff-only origin main`.
+7. Ghi kết quả review và merge (số PR, có/không phát hiện chặn) vào báo cáo cho người dùng.
 
 ## Skill bổ trợ
 
