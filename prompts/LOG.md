@@ -155,6 +155,15 @@ Mẫu một mục:
   - Test tự động kiểm độ tương phản WCAG của bảng màu.
 - **Kết quả:** PR `feat/11-notebook-theme`.
 
+## 2026-11-04 · `/kessie-skills:proj build #7 -> #15` — #15 Dữ liệu ghi món
+- **Yêu cầu:** Issue #15: bảng `meal_entries` và `foods`, RPC `log_meal`, truy vấn gợi ý, chuẩn hoá tên món, kèm test.
+- **Quyết định:**
+  - Chuẩn hoá tên ở server là nguồn sự thật: `normalize_food_name` (NFC + `unaccent` + lower + gộp khoảng trắng). `src/domain/food-name.ts` làm cùng việc đó ở client, có cùng bộ ví dụ test.
+  - `log_meal`: cùng `id` thì update; gửi lại đúng request cũ thì trả về bản ghi cũ và không tăng `use_count`.
+  - `suggest_foods`: tối đa 5 món, "bắt đầu bằng" xếp trước "chứa", ký tự đại diện của LIKE được escape.
+  - `meal_entries`, `foods`: chủ sở hữu được select/insert/update/delete; anon không có quyền gì.
+- **Kết quả:** PR `feat/15-meal-data`.
+
 ## 2026-11-04 · `tiếp tục` (`/kessie-skills:proj build #7 -> #15`) — #12 Tài khoản
 - **Yêu cầu:** Tiếp tục các issue còn lại, bắt đầu từ #12: đăng ký, xác nhận email, đăng nhập, quên mật khẩu, đăng xuất, chuyển màn hình theo trạng thái phiên.
 - **Quyết định:**
