@@ -126,6 +126,8 @@ npx expo install <pkg>   # luôn dùng thay cho npm install để có phiên b�
 4. **Merge tự động, không cần hỏi** khi không còn phát hiện chặn **và** mọi check CI bắt buộc đều xanh:
    - lệnh `gh pr merge <N> --merge --delete-branch`;
    - **không** dùng `--admin` để vượt bảo vệ nhánh.
+   - Check còn đang chạy thì chờ bằng `gh pr checks <N> --watch --required`.
+   - Check đỏ thì đọc log (`gh run view --log-failed`), sửa trên nhánh rồi chờ lại. Lỗi hạ tầng không do thay đổi gây ra thì chạy lại một lần (`gh run rerun --failed`); nếu vẫn đỏ thì báo người dùng.
 5. **Xung đột với `main`: tự giải quyết, không cần hỏi.**
    - Gộp `main` mới nhất vào nhánh PR rồi giải quyết xung đột.
    - Với file chỉ thêm (`prompts/LOG.md`, CHANGELOG) thì giữ cả hai phía, theo thứ tự thời gian.

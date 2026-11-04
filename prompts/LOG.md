@@ -100,4 +100,5 @@ Mẫu một mục:
   - Xung đột đụng spec hoặc ADR đã duyệt thì hỏi.
   - Tag, release, deploy, migration lên cloud vẫn phải hỏi.
   - Không áp dụng cho PR của Dependabot.
+  - Push lên nhánh PR (không phải `main`) không cần hỏi, vì cần cho việc sửa và giải quyết xung đột. Check CI còn chạy thì chờ; đỏ thì sửa hoặc chạy lại một lần, vẫn đỏ thì báo người dùng.
 - **Kết quả:** PR `docs/claude-pr-review-automerge`.
