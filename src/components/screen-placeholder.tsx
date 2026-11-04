@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { MarginRow, NotebookPage } from "@/components/notebook";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Spacing } from "@/constants/theme";
+import { space } from "@/constants/theme";
 
 type Props = {
   title: string;
@@ -14,13 +15,21 @@ type Props = {
 export function ScreenPlaceholder({ title, testID }: Props) {
   return (
     <ThemedView style={styles.container} testID={testID}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedText type="subtitle" accessibilityRole="header">
-          {title}
-        </ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          Đang xây dựng
-        </ThemedText>
+      <SafeAreaView style={styles.container} edges={["top"]}>
+        <NotebookPage style={styles.page}>
+          <MarginRow>
+            <ThemedText variant="headline" accessibilityRole="header">
+              {title}
+            </ThemedText>
+            <ThemedText
+              variant="bodySmall"
+              color="onSurfaceVariant"
+              style={styles.note}
+            >
+              Đang xây dựng
+            </ThemedText>
+          </MarginRow>
+        </NotebookPage>
       </SafeAreaView>
     </ThemedView>
   );
@@ -28,10 +37,6 @@ export function ScreenPlaceholder({ title, testID }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.three,
-    paddingTop: Spacing.four,
-    gap: Spacing.two,
-  },
+  page: { paddingTop: space.l },
+  note: { marginTop: space.xs },
 });

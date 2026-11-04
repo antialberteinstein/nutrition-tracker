@@ -1,27 +1,20 @@
 import { View, type ViewProps } from "react-native";
 
-import { ThemeColor } from "@/constants/theme";
+import { type ColorRole } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 
 export type ThemedViewProps = ViewProps & {
-  lightColor?: string;
-  darkColor?: string;
-  type?: ThemeColor;
+  /** Background colour role; defaults to the page background. (`role` is RN's a11y prop.) */
+  surface?: ColorRole;
 };
 
 export function ThemedView({
+  surface = "background",
   style,
-  lightColor,
-  darkColor,
-  type,
-  ...otherProps
+  ...rest
 }: ThemedViewProps) {
-  const theme = useTheme();
-
+  const { colors } = useTheme();
   return (
-    <View
-      style={[{ backgroundColor: theme[type ?? "background"] }, style]}
-      {...otherProps}
-    />
+    <View style={[{ backgroundColor: colors[surface] }, style]} {...rest} />
   );
 }
