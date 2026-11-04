@@ -1,0 +1,56 @@
+TIÊU ĐỀ: Ghi món có gợi ý, tab Hôm nay, Biểu đồ, nhắc ghi chép và xoá tài khoản (milestone 0.1.0)
+
+VAI TRÒ VÀ BỐI CẢNH
+Bạn là Senior Developer của Nutrition Tracker (Expo SDK 58, Supabase; docs/ADR.md ADR-003 đến ADR-006, ADR-009, ADR-010, ADR-012).
+- Đọc trước khi sửa: CLAUDE.md, docs/RequirementsOutline.md §3.3–3.5, §5; docs/modules/MealLog.md, docs/modules/Chart.md, docs/modules/Reminders.md, docs/modules/Account.md §3.4; brief .impeccable/surfaces/src-app-index-tsx.md.
+- Giả định prompts/01-foundation.txt (#8–#14) đã merge: client Supabase, profiles/goals/user_settings, src/domain/nutrition.ts, theme "Vở ô ly", tài khoản, Onboarding, Mục tiêu. Đối chiếu repo thật trước khi làm.
+- Làm lần lượt theo issue, mỗi issue một nhánh và một PR: #15 → #16 → #17 → #18 → #19 → #20 → #21.
+
+MỤC TIÊU
+Người dùng ghi món quen trong ≤ 3 chạm (gõ, chọn gợi ý, Lưu); thấy tổng của ngày so với mục tiêu ở tab Hôm nay; xem biểu đồ 7 hoặc 30 ngày có đường ngưỡng; nhận nhắc ghi chép mỗi ngày; xoá được tài khoản cùng toàn bộ dữ liệu.
+
+PHẠM VI
+1. Dữ liệu ghi món (#15):
+   - bảng meal_entries và foods theo MealLog.md §5;
+   - RPC log_meal chạy trong một giao dịch (ghi món + upsert món đã lưu), id do client sinh, on conflict do nothing;
+   - chặn ngày tương lai với dung sai +1 ngày (ADR-005);
+   - src/domain/food-name.ts chuẩn hoá tên (bỏ dấu, đ→d, gộp khoảng trắng);
+   - truy vấn gợi ý: "bắt đầu bằng" trước "chứa", last_used_at giảm dần, tối đa 5.
+2. Tab Hôm nay (#16) và bottom sheet ghi món (#17): build bằng impeccable theo surface brief.
+   - Ghi direction contract vào brief trước khi code.
+   - Dấu ấn riêng: cột lề đỏ. Calo dùng vạch dung lượng (không dùng vòng tròn). Mỗi chất một màu cố định.
+   - Vượt ngưỡng hiện bằng màu + "!" trong lề + chữ "Vượt X".
+   - Sheet: focus ô tên; Back lần lượt đóng bàn phím → đóng gợi ý → hỏi bỏ món. Không có Hoàn tác sau khi lưu.
+   - Sau #17: finish review, rồi impeccable documenter viết DESIGN.md và .impeccable/design.json.
+3. Món đã lưu (#18): Cài đặt › Món đã lưu; xoá không ảnh hưởng món đã ghi.
+4. Biểu đồ (#19):
+   - RPC tổng hợp theo ngày; buildSeries() thuần (ngày chưa ghi là khoảng trống, không phải 0);
+   - victory-native (cài bằng npx expo install); đường ngưỡng theo Chart.md §4;
+   - chế độ bảng cho TalkBack; nhớ lựa chọn bằng AsyncStorage.
+5. Nhắc ghi chép (#20): expo-notifications với trigger DAILY.
+   - Không cam kết đúng giờ, không xin quyền exact alarm (ADR-006).
+   - Có Cài đặt › Nhắc nhở và hộp thoại sau Onboarding.
+6. Xoá tài khoản (#21): Edge Function delete-account.
+   - Xác thực JWT và xác thực lại mật khẩu; xoá đúng auth.uid().
+   - Service role chỉ nằm trong function.
+7. Chữ hiển thị chỉ tiếng Việt; ngày dd/MM/yyyy; số dùng dấu chấm phân nghìn.
+
+NGOÀI PHẠM VI
+- Calo ròng và Workout (CHART-09 đến 11, 0.2.0). Firebase FCM (ADR-007).
+- Cơ sở dữ liệu món ăn, nhập theo khẩu phần. Offline.
+
+ĐẦU RA
+- Migration, RPC và Edge Function kèm pgTAP / test trên Supabase local, nối vào CI.
+- Unit test cho food-name, buildSeries, tính thời điểm thông báo; test component cho sheet và Hôm nay.
+- E2E Appium TC-E2E-09 đến 18 và 20 (docs/testing/test-cases.md); element E2E cần có testID.
+- DESIGN.md và .impeccable/design.json sau #17; CHANGELOG [Unreleased]; mục prompts/LOG.md.
+- Báo cáo trong mỗi PR:
+  - lệnh đã chạy và kết quả;
+  - E2E đạt trên thiết bị nào (người dùng chạy scripts/run-test.sh; agent không tự chạy adb hay máy ảo);
+  - phần chưa xác minh.
+
+TIÊU CHÍ HOÀN THÀNH
+- MEAL-01 đến 19, CHART-01 đến 08 và 12 đến 14, REM-01 đến 11, ACC-11, 12 đạt như bảng AC trong spec.
+- Ghi món quen trong ≤ 3 chạm, quan sát trên máy thật.
+- CI xanh.
+- Thông báo, deep link, bàn phím và TalkBack chỉ coi là đạt khi đã kiểm trên thiết bị thật (TC-DEV-01, 02, 04, 05 trong issue #22). Không tuyên bố đã triển khai hoặc xác minh trên môi trường thật khi chưa có bằng chứng.

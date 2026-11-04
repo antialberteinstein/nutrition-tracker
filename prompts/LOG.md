@@ -78,3 +78,35 @@ Mẫu một mục:
   - `eslint.config.js` do `expo lint` sinh; Prettier dùng cấu hình mặc định (hook config-protection chặn tạo file cấu hình riêng).
   - Supabase CLI là devDependency (`npx supabase`).
 - **Kết quả:** commit `chore: scaffold repository foundation`.
+
+## 2026-11-04 · `/kessie-skills:proj plan`
+- **Yêu cầu:** Lên kế hoạch milestone 0.1.0 từ các AC đã duyệt.
+- **Quyết định:** Duyệt 17 issue theo thứ tự nền → lõi → giao diện → tích hợp → kiểm tra trên thiết bị → phát hành. Luồng mỏng đi trước: tài khoản → onboarding → ghi món → Hôm nay. Viết 2 prompt giai đoạn. Milestone 0.2.0 (Workout) để plan sau.
+- **Kết quả:** milestone `0.1.0`, issue #7–#23; `prompts/01-foundation.txt`, `prompts/02-meal-log.txt`.
+## 2026-11-04 · Xác nhận sau giai đoạn 3
+- **Yêu cầu:** Push 2 commit đầu lên GitHub; bật bảo vệ `main` khi CI xanh; thêm plugin chính chủ của Expo vào bảng "Skill bổ trợ".
+- **Quyết định:** Thêm `expo@claude-plugins-official` vào bảng (chỉ gợi ý lệnh cài, không tự cài). Bảo vệ `main`: bắt buộc PR và hai check CI, cấm force-push, không bắt buộc reviewer.
+- **Kết quả:** PR `docs/claude-expo-skill`.
+
+## 2026-11-04 · Quy tắc review và merge PR tự động
+- **Yêu cầu:** Thêm vào CLAUDE.md:
+  - mỗi khi mở PR mới, tạo sub-agent gọi skill `kessie-skills:pr-review` để review;
+  - sau đó tự merge hoặc tự giải quyết xung đột, không cần hỏi;
+  - luôn pull lại `main` ở local sau khi merge;
+  - nếu không gọi được skill thì báo người dùng.
+- **Quyết định:**
+  - Chỉ merge khi không còn phát hiện chặn và CI bắt buộc xanh; không dùng `--admin`.
+  - Không gọi được skill thì báo người dùng và không merge.
+  - Xung đột đụng spec hoặc ADR đã duyệt thì hỏi.
+  - Tag, release, deploy, migration lên cloud vẫn phải hỏi.
+  - Không áp dụng cho PR của Dependabot.
+  - Push lên nhánh PR (không phải `main`) không cần hỏi, vì cần cho việc sửa và giải quyết xung đột. Check CI còn chạy thì chờ; đỏ thì sửa hoặc chạy lại một lần, vẫn đỏ thì báo người dùng.
+- **Kết quả:** PR `docs/claude-pr-review-automerge`.
+
+## 2026-11-04 · Không cần hỏi với PR
+- **Yêu cầu:** Trong dự án này, PR không cần hỏi ý kiến chủ dự án. PR #6 và #24 đã được chủ dự án tự merge. Quy tắc review và merge tự động áp dụng cho các PR từ nay về sau.
+- **Quyết định:**
+  - Không thêm bước hỏi riêng cho PR đụng spec, ADR hay CLAUDE.md (gợi ý của reviewer bị từ chối).
+  - Bỏ "mở PR" khỏi danh sách phải hỏi.
+  - Xung đột trên spec đã duyệt hoặc ADR "Chấp nhận" mà không gộp được bằng cách giữ cả hai phía thì vẫn dừng lại hỏi (bước 5, mục "Review và merge PR" trong CLAUDE.md).
+- **Kết quả:** PR `docs/claude-pr-no-ask`.

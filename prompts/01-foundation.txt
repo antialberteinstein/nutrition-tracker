@@ -1,0 +1,48 @@
+TIÊU ĐỀ: Xây nền tảng 0.1.0: client Supabase, schema hồ sơ, logic dinh dưỡng, theme "Vở ô ly", tài khoản, onboarding, mục tiêu
+
+VAI TRÒ VÀ BỐI CẢNH
+Bạn là Senior Developer của Nutrition Tracker (React Native + Expo SDK 58, TypeScript strict, Expo Router, Supabase; xem docs/ADR.md ADR-001 đến ADR-005, ADR-010, ADR-012).
+- Đọc trước khi sửa: CLAUDE.md, docs/RequirementsOutline.md §2, §3.1, §3.2, §4, §5; docs/modules/Account.md, docs/modules/Goals.md, docs/modules/Reminders.md §5; PRODUCT.md; .impeccable/surfaces/src-app-index-tsx.md.
+- Repo hiện chỉ có khung: 3 tab placeholder, Supabase local, CI. Không mặc định rằng code hay bảng nào đã có.
+- Làm lần lượt theo issue, mỗi issue một nhánh và một PR: #8 → #9 → #10 → #11 → #12 → #13 → #14 (milestone 0.1.0).
+
+MỤC TIÊU
+Người dùng tạo tài khoản bằng email và mật khẩu, nhập hồ sơ ở Onboarding, rồi thấy BMI, BMR, TDEE và mục tiêu gợi ý cho 4 chỉ số. Người dùng tự đặt được mục tiêu và thấy cảnh báo không chặn. Giao diện theo thế giới "Vở ô ly" trên Material 3.
+
+PHẠM VI
+1. Nền app (#8):
+   - Supabase client đọc EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY;
+   - phiên lưu theo hướng dẫn Expo của Supabase, khoá nằm trong expo-secure-store;
+   - QueryClient với mutation không tự retry;
+   - supabase/seed.sql có 2 tài khoản test cho Supabase local.
+2. Dữ liệu (#9): bảng profiles, goals, user_settings đúng hợp đồng trong Account.md §5, Goals.md §5, Reminders.md §5. RLS theo user_id = auth.uid(); có pgTAP hai tài khoản.
+3. Logic (#10): src/domain/nutrition.ts là module thuần, công thức đúng Goals.md §4. Unit test gồm 2 ví dụ trong spec và giá trị biên 1978.5 → 1979.
+4. Theme (#11):
+   - token màu theo vai trò Material 3 từ bảng màu vở, sáng và tối thiết kế riêng, Dynamic Color tắt;
+   - thang chữ Display / Title / Body; spacing 8 / 32 dp;
+   - thành phần cột lề 40 dp; icon tab thật.
+5. Tài khoản (#12): đăng ký, xác nhận email (deep link nutritiontracker://), đăng nhập, quên mật khẩu, đăng xuất. Điều hướng theo phiên: không phiên → Đăng nhập; chưa có hồ sơ → Onboarding; đã có hồ sơ → Hôm nay.
+6. Onboarding và Hồ sơ (#13), Mục tiêu (#14): theo Account.md §2–4 và Goals.md §2–4.
+   - Lưu goals với quy ước null = dùng gợi ý.
+   - Cảnh báo W1–W6 hiện dưới trường liên quan, không dùng dialog.
+7. Chữ hiển thị: chỉ tiếng Việt, giọng trung tính xưng "bạn". Số dùng dấu chấm phân nghìn.
+
+NGOÀI PHẠM VI
+- Ghi món, Hôm nay, Biểu đồ, Nhắc nhở, Xoá tài khoản (prompts/02-meal-log.txt).
+- Workout (0.2.0). Đăng nhập Google/Apple. Offline.
+
+ĐẦU RA
+- Mã nguồn theo bố cục trong CLAUDE.md (src/domain, src/schemas, src/app, src/components); tên file kebab-case.
+- Migration trong supabase/migrations kèm pgTAP, chạy trong job database của CI.
+- Unit test và test component cho logic và form; E2E Appium cho TC-E2E-01 đến 08 và 19 (docs/testing/test-cases.md).
+- CHANGELOG [Unreleased]; một mục prompts/LOG.md cho mỗi yêu cầu.
+- Báo cáo trong mỗi PR:
+  - lệnh đã chạy và kết quả;
+  - test case E2E đã đạt trên thiết bị nào (người dùng chạy scripts/run-test.sh);
+  - phần chưa xác minh.
+
+TIÊU CHÍ HOÀN THÀNH
+- ACC-01 đến 10, 13 đến 16 và GOAL-01 đến 16 đạt như bảng AC trong spec.
+- Test RLS chứng minh tài khoản B không đọc hay ghi được dữ liệu của A.
+- CI xanh trên mọi PR.
+- Không coi build thành công, test trên Supabase local hay CI là bằng chứng đã chạy đúng trên thiết bị thật hay trên project cloud. Không tuyên bố đã triển khai hoặc xác minh trên môi trường thật khi chưa có bằng chứng.

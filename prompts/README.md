@@ -8,7 +8,8 @@ Mỗi file `NN-slug.txt` là một giai đoạn xây dựng có thể giao cho c
 
 | File | Mục đích | Issue/PR |
 |---|---|---|
-| _(chưa có)_ | Prompt giai đoạn sẽ được tạo khi lên kế hoạch milestone 0.1.0 (`/kessie-skills:proj plan`) | |
+| [01-foundation.txt](01-foundation.txt) | Nền tảng 0.1.0: client Supabase, schema hồ sơ/mục tiêu/cài đặt, logic dinh dưỡng, theme "Vở ô ly", tài khoản, Onboarding, Mục tiêu | #8–#14 |
+| [02-meal-log.txt](02-meal-log.txt) | Ghi món có gợi ý, Hôm nay, bottom sheet + DESIGN.md, Món đã lưu, Biểu đồ, Nhắc ghi chép, Xoá tài khoản | #15–#21 |
 
 ## Quy tắc biên tập
 - Giữ ý định sản phẩm; bỏ hội thoại; gộp các lời phê duyệt vào prompt.
