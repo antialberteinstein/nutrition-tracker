@@ -44,6 +44,8 @@ e2e/mobile-appium/scripts/run-metro.sh   # 2. chạy Metro (để chạy riêng 
 e2e/mobile-appium/scripts/run-test.sh    # 3. chạy toàn bộ E2E; có thể truyền tham số của pytest, ví dụ -k meal
 ```
 
+Không build được ở máy (thiếu JDK 17 hoặc ổ đĩa) thì thay bước 1 bằng build trên cloud: `eas build -p android --profile e2e` cho ra cùng APK debug (`assembleDebug`, tải JS từ Metro); tải file `.apk` về và đặt tại `build/app-debug.apk`.
+
 Mã thoát của `run-test.sh`:
 
 | Mã | Ý nghĩa | Việc tiếp theo |

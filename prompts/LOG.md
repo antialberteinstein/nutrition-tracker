@@ -202,3 +202,11 @@ Mẫu một mục:
   - ADR-014 thay một phần ADR-012 (vị trí script); chủ dự án duyệt khi chọn phạm vi.
   - Không sửa đường dẫn cũ trong `prompts/*.txt` và các mục LOG cũ (lịch sử).
 - **Kết quả:** PR `chore/37-move-e2e-scripts`.
+
+## 2026-11-05 · `Dùng cách build trên cloud đi` — APK E2E qua EAS
+- **Yêu cầu:** Máy hết dung lượng nên không build APK local được; build APK cho E2E trên cloud.
+- **Quyết định:**
+  - Tạo project EAS `@antialberteinstein/nutrition-tracker`, ghi `extra.eas.projectId` vào `app.config.ts`.
+  - `eas.json`: profile `e2e` (APK debug, `:app:assembleDebug`, không cần credentials, tải JS từ Metro như bản build local) và profile `preview` (APK, `appVersionSource: remote`, `autoIncrement`) theo ADR-013.
+  - `build-debug-apk.sh` giữ nguyên; build cloud là lựa chọn thay thế, ghi trong `docs/testing/test-plan.md`.
+- **Kết quả:** PR `chore/23-eas-json` (Refs #23).
