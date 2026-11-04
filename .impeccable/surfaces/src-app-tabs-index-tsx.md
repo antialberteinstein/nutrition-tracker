@@ -63,5 +63,5 @@ Thế giới hình ảnh chỉ góp 4 thứ; bố cục, điều hướng và co
 - Màu cụ thể của đạm, natri, đường, và bảng màu tối, trong phạm vi bảng màu vở.
 
 ## Kiểm tra
-- Ảnh chụp từ `scripts/run-test.sh` (`reports/`), hoặc ảnh chủ dự án gửi. Agent không tự chạy `adb` hay máy ảo.
+- Ảnh chụp từ `e2e/mobile-appium/scripts/run-test.sh` (`reports/`), hoặc ảnh chủ dự án gửi. Agent không tự chạy `adb` hay máy ảo.
 - Direction contract ghi vào brief này lúc bắt đầu build. DESIGN.md viết sau build, dựa trên giao diện đã làm thật.

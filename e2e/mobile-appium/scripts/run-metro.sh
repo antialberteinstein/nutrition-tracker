@@ -3,7 +3,7 @@
 # Loads E2E environment variables from .env.e2e when present (local Supabase, never real data).
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$ROOT"
 
 if [ -f .env.e2e ]; then

@@ -52,9 +52,9 @@ npm run format:check         # Prettier
 npm run test:coverage        # Jest + React Native Testing Library
 npm run test:db              # pgTAP trên Supabase local (cần `npx supabase start`)
 npm run build                # expo export android: JS bundle được
-scripts/build-debug-apk.sh   # APK debug → build/app-debug.apk
-scripts/run-metro.sh         # Metro cho APK debug (terminal riêng)
-scripts/run-test.sh          # E2E Appium trên thiết bị Android thật
+scripts/build-debug-apk.sh               # APK debug → build/app-debug.apk
+e2e/mobile-appium/scripts/run-metro.sh   # Metro cho APK debug (terminal riêng)
+e2e/mobile-appium/scripts/run-test.sh    # E2E Appium trên thiết bị Android thật
 ```
 
 | Lớp | Chứng minh | **Không** chứng minh |
@@ -64,7 +64,7 @@ scripts/run-test.sh          # E2E Appium trên thiết bị Android thật
 | `build` | JS bundle được cho Android | APK chạy được trên máy |
 | E2E Appium | Luồng chính chạy trên một thiết bị thật cụ thể | Mọi model máy, thông báo đúng giờ, chế độ tiết kiệm pin |
 
-E2E dùng Supabase local: `npx supabase db reset` nạp `supabase/seed.sql`, tạo hai tài khoản đã xác nhận email là `e2e-a@test.local` và `e2e-b@test.local`, cùng mật khẩu giả `E2e-local-only-1` (chỉ dùng ở local). Chép `.env.example` thành `.env.e2e` (đã gitignore) và điền URL cùng anon key lấy từ `npx supabase status`; `scripts/run-metro.sh` sẽ nạp file này.
+E2E dùng Supabase local: `npx supabase db reset` nạp `supabase/seed.sql`, tạo hai tài khoản đã xác nhận email là `e2e-a@test.local` và `e2e-b@test.local`, cùng mật khẩu giả `E2e-local-only-1` (chỉ dùng ở local). Chép `.env.example` thành `.env.e2e` (đã gitignore) và điền URL cùng anon key lấy từ `npx supabase status`; `e2e/mobile-appium/scripts/run-metro.sh` sẽ nạp file này.
 
 > ⚠️ Seed chỉ dành cho Supabase local. **Không bao giờ** chạy `supabase db reset --linked` hay `supabase db push --include-seed` lên project cloud: lệnh đó sẽ tạo hai tài khoản có mật khẩu đã công khai ở trên.
 
@@ -77,8 +77,8 @@ src/app/            route (Expo Router): Hôm nay · Biểu đồ · Cài đặt
 src/components/     UI dùng chung
 src/constants/      theme
 supabase/           config.toml, migrations/, tests/ (pgTAP)
-e2e/mobile-appium/  Appium + pytest (uv)
-scripts/            build APK, Metro, chạy E2E
+e2e/mobile-appium/  Appium + pytest (uv); scripts/ chạy Metro và E2E
+scripts/            build APK
 docs/               spec, ADR, testing
 ```
 

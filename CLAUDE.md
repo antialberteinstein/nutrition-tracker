@@ -27,6 +27,7 @@ Mọi quyết định kỹ thuật nằm trong **`docs/ADR.md`**, một file duy
   - Supabase local + một project cloud;
   - Jest, pgTAP, Appium;
   - phát hành APK qua EAS, không OTA.
+- **ADR-014:** script chạy Metro và E2E nằm ở `e2e/mobile-appium/scripts/`; `scripts/` chỉ còn build APK (thay một phần ADR-012).
 - **Bị loại, không đề xuất lại:** Firebase Auth/Firestore, backend riêng, offline sync, Maestro/Detox, lặp hằng tháng, exclusion constraint cho lịch, OTA update, Dynamic Color.
 
 ### Cách dùng `docs/ADR.md`
@@ -42,7 +43,7 @@ Mọi quyết định kỹ thuật nằm trong **`docs/ADR.md`**, một file duy
 
 - `src/app/`: route (Expo Router): `(auth)/` khi chưa đăng nhập, `onboarding` khi chưa có hồ sơ, `(tabs)/` khi đã có hồ sơ, `auth/callback` nhận deep link. `src/features/<tính năng>/`: logic gọi Supabase, schema zod, provider. `src/domain/`: logic thuần. `src/components/`: UI dùng chung. `src/constants/`: theme.
 - `supabase/`: `config.toml`, `migrations/`, `tests/` (pgTAP).
-- `e2e/mobile-appium/`: Appium + pytest (uv). `scripts/`: build APK, Metro, chạy E2E.
+- `e2e/mobile-appium/`: Appium + pytest (uv); `e2e/mobile-appium/scripts/`: chạy Metro và E2E (ADR-014). `scripts/`: build APK.
 - `docs/`: spec (`RequirementsOutline.md`, `modules/`), `ADR.md`, `testing/`. Thiết kế: `PRODUCT.md`, `.impeccable/surfaces/`. Nhật ký prompt: `prompts/LOG.md`.
 
 ## Lệnh
@@ -53,7 +54,7 @@ npm test                 # Jest; npm run test:coverage để có coverage
 npx supabase start && npm run test:db   # pgTAP trên Supabase local (cần Docker)
 npm run build            # expo export android: kiểm tra JS bundle được
 npm run build:apk        # scripts/build-debug-apk.sh → build/app-debug.apk
-npm run test:e2e         # scripts/run-test.sh — CHỈ chạy khi người dùng yêu cầu
+npm run test:e2e         # e2e/mobile-appium/scripts/run-test.sh — CHỈ chạy khi người dùng yêu cầu
 npx expo install <pkg>   # luôn dùng thay cho npm install để có phiên bản hợp với SDK
 ```
 
@@ -77,7 +78,7 @@ npx expo install <pkg>   # luôn dùng thay cho npm install để có phiên b�
 
 ## Kiểm thử mobile (Appium)
 
-- **Không tự ý chạy máy ảo (`emulator`) hay lệnh `adb`.** Chỉ chạy `scripts/run-test.sh`, và chỉ khi người dùng yêu cầu. `adb` chỉ nằm bên trong script.
+- **Không tự ý chạy máy ảo (`emulator`) hay lệnh `adb`.** Chỉ chạy `e2e/mobile-appium/scripts/run-test.sh`, và chỉ khi người dùng yêu cầu. `adb` chỉ nằm bên trong script.
 - `run-test.sh` thoát với mã **3** → **báo người dùng** rằng thiết bị chưa kết nối (cắm, mở khoá, bật USB debugging), rồi dừng.
 - **Test mobile lỗi thì sửa dựa trên `reports/`:**
   1. đọc `junit.xml` hoặc `report.html` để biết test nào lỗi;

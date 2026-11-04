@@ -194,3 +194,11 @@ Mẫu một mục:
   - Thêm vai trò màu `warning` (vàng hổ phách) vào theme, có trong test tương phản. Thêm `src/domain/format.ts` để định dạng số kiểu Việt ("2.056", "22,9").
   - E2E: TC-E2E-05 nằm trong luồng Onboarding; TC-E2E-06 thêm vào `test_onboarding.py`; TC-E2E-08 kiểm tra mục tiêu đạm gợi ý đổi theo cân nặng (ACC-07).
 - **Kết quả:** PR `feat/14-goals`.
+
+## 2026-11-05 · Chuyển script E2E và chạy test (sau `/kessie-skills:proj`) — #37
+- **Yêu cầu:** Chuyển thư mục `scripts/` vào `e2e/mobile-appium/` và chạy E2E trên điện thoại đã kết nối adb.
+- **Quyết định:**
+  - Chỉ chuyển `run-test.sh` và `run-metro.sh` vào `e2e/mobile-appium/scripts/`; `build-debug-apk.sh` ở lại `scripts/` vì `npm run build:apk` dùng chung.
+  - ADR-014 thay một phần ADR-012 (vị trí script); chủ dự án duyệt khi chọn phạm vi.
+  - Không sửa đường dẫn cũ trong `prompts/*.txt` và các mục LOG cũ (lịch sử).
+- **Kết quả:** PR `chore/37-move-e2e-scripts`.
