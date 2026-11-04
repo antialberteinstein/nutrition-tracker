@@ -97,8 +97,9 @@ def sign_out_from_tabs(driver):
     assert by_id(driver, "screen-login").is_displayed()
 
 
-def test_onboarding_validation_then_save(driver):
-    """TC-E2E-04 · ACC-04, ACC-05: first sign-in lands on onboarding; invalid values lock 'Tiếp tục'."""
+def test_onboarding_validation_then_save(driver, config):
+    """TC-E2E-04 · ACC-04, ACC-05: first sign-in lands on onboarding; invalid values lock 'Tiếp tục'.
+    TC-E2E-05 · ACC-06, GOAL-01, GOAL-02: the summary shows example 1; reopening goes to Hôm nay."""
     sign_in(driver)
     if driver.find_elements(AppiumBy.ID, "screen-today"):
         sign_out_from_tabs(driver)  # leave the app signed out for the tests that follow
@@ -124,12 +125,74 @@ def test_onboarding_validation_then_save(driver):
     by_id(driver, "profile-goal-lose").click()
     wait_until(driver, submit_is(True))
     by_id(driver, "profile-submit").click()
+
+    # Goals.md §4 example 1 (male, 70 kg, 175 cm, 30, moderate, lose).
+    assert by_id(driver, "screen-onboarding-summary").is_displayed()
+    assert by_id(driver, "summary-bmr").text == "1.649 kcal"
+    assert by_id(driver, "summary-tdee").text == "2.556 kcal"
+    assert by_id(driver, "summary-calories").text == "2.056 kcal"
+    assert by_id(driver, "summary-protein").text == "56 · 112 · 154 g"
+    assert by_id(driver, "summary-sugar").text == "0 · 26 · 51 g"
+    driver.implicitly_wait(0)
+    assert not driver.find_elements(
+        AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().textContains("Tự đặt")'
+    )
+    driver.implicitly_wait(10)
+    by_id(driver, "onboarding-start").click()
+    assert by_id(driver, "screen-today").is_displayed()
+
+    driver.terminate_app(config["appPackage"])
+    driver.activate_app(config["appPackage"])
     assert by_id(driver, "screen-today").is_displayed()
 
 
-def test_profile_unsaved_changes_then_save(driver):
-    """TC-E2E-08 · ACC-08 (ACC-07 goal recalculation is checked once #14 shows goals)."""
+def open_goals(driver):
+    by_text(driver, "Cài đặt").click()
+    by_id(driver, "settings-goals").click()
+    assert by_id(driver, "screen-settings-goals").is_displayed()
+
+
+def save_goals(driver):
+    hide_keyboard(driver)
+    by_id(driver, "goals-submit").click()
+    wait_until(driver, present("goals-saved"))
+
+
+def test_goal_warnings_then_use_suggestion(driver):
+    """TC-E2E-06 · GOAL-03, GOAL-04, GOAL-06, GOAL-10: warnings never block; 'Dùng gợi ý' clears."""
     if not driver.find_elements(AppiumBy.ID, "screen-today"):
+        pytest.skip("needs the profile created by test_onboarding_validation_then_save")
+    open_goals(driver)
+    type_into(driver, "goal-calorieAdjustment", "+1")
+    wait_until(driver, present("warning-W1-calorieAdjustment"))
+    save_goals(driver)
+
+    # Switch the profile to 'gain'; the custom +1 adjustment is kept.
+    driver.back()
+    by_id(driver, "settings-profile").click()
+    by_id(driver, "profile-goal-gain").click()
+    by_id(driver, "profile-submit").click()
+    by_id(driver, "settings-goals").click()
+    assert by_id(driver, "goal-calorieAdjustment").text == "+1"
+    type_into(driver, "goal-calorieAdjustment", "-1")
+    wait_until(driver, present("warning-W2-calorieAdjustment"))
+    type_into(driver, "goal-calorieTarget", "1500")
+    wait_until(driver, present("warning-W3-calorieTarget"))
+    save_goals(driver)
+
+    hide_keyboard(driver)
+    by_id(driver, "goal-calorieTarget-reset").click()
+    wait_until(driver, absent("goal-calorieTarget-custom"))
+    save_goals(driver)
+    driver.back()
+    by_id(driver, "settings-goals").click()  # reopened: still following the suggestion
+    wait_until(driver, absent("goal-calorieTarget-custom"))
+    driver.back()
+
+
+def test_profile_unsaved_changes_then_save(driver):
+    """TC-E2E-08 · ACC-07, ACC-08: 'Ở lại' keeps typed data; saved weight updates suggested goals."""
+    if driver.find_elements(AppiumBy.ID, "screen-login"):
         pytest.skip("needs the profile created by test_onboarding_validation_then_save")
     by_text(driver, "Cài đặt").click()
     by_id(driver, "settings-profile").click()
@@ -145,6 +208,9 @@ def test_profile_unsaved_changes_then_save(driver):
     by_id(driver, "profile-submit").click()
     assert by_id(driver, "screen-settings").is_displayed()
     assert "72 kg" in by_id(driver, "settings-profile").get_attribute("content-desc")
+    by_id(driver, "settings-goals").click()
+    assert by_id(driver, "goal-proteinTargetG").text == "115"  # round(1.6 × 72), suggested
+    driver.back()
 
     by_id(driver, "settings-signout").click()
     assert by_id(driver, "screen-login").is_displayed()

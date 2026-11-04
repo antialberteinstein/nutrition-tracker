@@ -7,6 +7,7 @@ Mọi thay đổi đáng chú ý của Nutrition Tracker được ghi tại đâ
 ## [Unreleased]
 
 ### Thêm
+- Mục tiêu: màn tóm tắt BMI, BMR, TDEE và mục tiêu gợi ý ở cuối Onboarding; Cài đặt › Mục tiêu để sửa mức điều chỉnh calo và tự đặt mục tiêu calo, đạm, natri, đường, có nhãn "Tự đặt · gợi ý" và nút "Dùng gợi ý"; cảnh báo W1–W6 màu vàng ngay dưới trường, không chặn lưu ([#14](https://github.com/antialberteinstein/nutrition-tracker/issues/14)).
 - Hồ sơ: màn nhập hồ sơ lần đầu (cân nặng, chiều cao, giới tính, năm sinh, mức vận động, mong muốn) và Cài đặt › Hồ sơ; kiểm tra giá trị ngay dưới từng trường, nhận dấu phẩy thập phân, hỏi trước khi thoát app hoặc bỏ thay đổi chưa lưu ([#13](https://github.com/antialberteinstein/nutrition-tracker/issues/13)).
 - Tài khoản: đăng ký, xác nhận email qua deep link, đăng nhập, quên và đặt lại mật khẩu, đăng xuất; màn hình chuyển theo trạng thái phiên và hồ sơ ([#12](https://github.com/antialberteinstein/nutrition-tracker/issues/12)).
 - Giao diện "Vở ô ly" trên Material 3: bảng màu sáng/tối riêng (tắt Dynamic Color), màu cố định cho từng chất, thang chữ, cột lề đỏ, icon tab Hôm nay · Biểu đồ · Cài đặt ([#11](https://github.com/antialberteinstein/nutrition-tracker/issues/11)).

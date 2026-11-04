@@ -1,24 +1,36 @@
 import { useFocusEffect } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Alert, BackHandler } from "react-native";
 
-import { Button } from "@/components/form";
+import { Button, FormError } from "@/components/form";
 import { FormScreen } from "@/components/form-screen";
+import { computeTargets, type Profile } from "@/domain/nutrition";
 import { signOut } from "@/features/auth/auth";
-import { EMPTY_PROFILE_FORM, useSaveProfile } from "@/features/profile/profile";
+import { TargetsSummary } from "@/features/goals/targets-summary";
+import {
+  EMPTY_PROFILE_FORM,
+  toFormValues,
+  useSaveProfile,
+} from "@/features/profile/profile";
 import { ProfileForm } from "@/features/profile/profile-form";
 
 /**
- * Account.md §2, §3: first profile entry. Saving creates the profile, which moves the root guards
- * on to the tabs (the goal summary between the two arrives with issue #14).
+ * Account.md §2: profile form → "Tiếp tục" → summary of BMI, BMR and suggested goals → "Bắt đầu".
+ * Only "Bắt đầu" saves, so the root guards move on to the tabs after the user saw the summary.
  */
 export default function OnboardingScreen() {
   const save = useSaveProfile();
+  const [draft, setDraft] = useState<Profile | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  // Back never returns to a previous screen here; it asks to leave the app (Account.md §3.5).
+  // Back on the summary returns to the form; on the form it asks to leave the app (§3.5).
   useFocusEffect(
     useCallback(() => {
       const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+        if (draft) {
+          setDraft(null);
+          return true;
+        }
         Alert.alert("Thoát app?", "Hồ sơ chưa được lưu.", [
           { text: "Ở lại", style: "cancel" },
           {
@@ -30,8 +42,39 @@ export default function OnboardingScreen() {
         return true;
       });
       return () => sub.remove();
-    }, []),
+    }, [draft]),
   );
+
+  if (draft) {
+    // A new account has no custom goals yet and Workout is off (GOAL-02).
+    const targets = computeTargets(
+      draft,
+      {},
+      { currentYear: new Date().getFullYear(), workoutEnabled: false },
+    );
+    const start = async () => {
+      setError(null);
+      const result = await save.mutateAsync(draft);
+      if (!result.ok) setError(result.failure.message); // stay here, keep the draft (ACC-14)
+    };
+    return (
+      <FormScreen
+        title="Mục tiêu gợi ý"
+        subtitle="Tính từ hồ sơ của bạn. Bạn sửa được trong Cài đặt › Mục tiêu."
+        testID="screen-onboarding-summary"
+        onBack={() => setDraft(null)}
+      >
+        <TargetsSummary targets={targets} workoutEnabled={false} />
+        <FormError message={error} testID="onboarding-error" />
+        <Button
+          label="Bắt đầu"
+          onPress={() => void start()}
+          loading={save.isPending}
+          testID="onboarding-start"
+        />
+      </FormScreen>
+    );
+  }
 
   return (
     <FormScreen
@@ -40,9 +83,14 @@ export default function OnboardingScreen() {
       testID="screen-onboarding"
     >
       <ProfileForm
-        initialValues={EMPTY_PROFILE_FORM}
+        initialValues={
+          save.variables ? toFormValues(save.variables) : EMPTY_PROFILE_FORM
+        }
         submitLabel="Tiếp tục"
-        onSubmit={save.mutateAsync}
+        onSubmit={async (p) => {
+          setDraft(p);
+          return { ok: true };
+        }}
       />
       <Button
         label="Đăng xuất"

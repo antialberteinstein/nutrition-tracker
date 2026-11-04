@@ -183,3 +183,14 @@ Mẫu một mục:
   - Tab Cài đặt thành stack (`settings/index`, `settings/profile`).
   - E2E TC-E2E-04, 08; chạy `npx supabase db reset` trước mỗi lượt E2E (ghi trong test-plan). TC-E2E-05 cần màn tóm tắt nên làm cùng #14.
 - **Kết quả:** PR `feat/13-onboarding`.
+
+## 2026-11-04 · `tiếp tục` (`/kessie-skills:proj build #7 -> #15`) — #14 Mục tiêu
+- **Yêu cầu:** Làm #14: tóm tắt mục tiêu cuối Onboarding, Cài đặt › Mục tiêu, cảnh báo W1–W6.
+- **Quyết định:**
+  - Onboarding hai bước: "Tiếp tục" chỉ kiểm tra và hiện tóm tắt; "Bắt đầu" mới lưu hồ sơ. Nhờ vậy guard ở gốc không bỏ qua màn tóm tắt.
+  - Mỗi mục tiêu là "chữ đang gõ" hoặc `null` (theo gợi ý). "Dùng gợi ý" đặt về `null`; bấm "Lưu" thì ghi `null` vào `goals`. Ô trống là lỗi (GOAL-08), không phải "theo gợi ý".
+  - Gợi ý và cảnh báo tính lại ngay khi gõ, bằng `computeTargets`. Ô đang gõ dở giữ giá trị đã lưu để số không nhảy.
+  - Sau khi lưu vẫn ở lại màn Mục tiêu để cảnh báo còn hiện (Goals.md §3.1).
+  - Thêm vai trò màu `warning` (vàng hổ phách) vào theme, có trong test tương phản. Thêm `src/domain/format.ts` để định dạng số kiểu Việt ("2.056", "22,9").
+  - E2E: TC-E2E-05 nằm trong luồng Onboarding; TC-E2E-06 thêm vào `test_onboarding.py`; TC-E2E-08 kiểm tra mục tiêu đạm gợi ý đổi theo cân nặng (ACC-07).
+- **Kết quả:** PR `feat/14-goals`.
