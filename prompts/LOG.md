@@ -144,3 +144,12 @@ Mẫu một mục:
   - W3 so mục tiêu với BMR đã làm tròn.
   - Ngưỡng đường tính theo mục tiêu calo đang dùng.
 - **Kết quả:** PR `feat/10-nutrition-domain`.
+
+## 2026-11-04 · `/kessie-skills:proj build #7 -> #15` — #15 Dữ liệu ghi món
+- **Yêu cầu:** Issue #15: bảng `meal_entries` và `foods`, RPC `log_meal`, truy vấn gợi ý, chuẩn hoá tên món, kèm test.
+- **Quyết định:**
+  - Chuẩn hoá tên ở server là nguồn sự thật: `normalize_food_name` (NFC + `unaccent` + lower + gộp khoảng trắng). `src/domain/food-name.ts` làm cùng việc đó ở client, có cùng bộ ví dụ test.
+  - `log_meal`: cùng `id` thì update; gửi lại đúng request cũ thì trả về bản ghi cũ và không tăng `use_count`.
+  - `suggest_foods`: tối đa 5 món, "bắt đầu bằng" xếp trước "chứa", ký tự đại diện của LIKE được escape.
+  - `meal_entries`, `foods`: chủ sở hữu được select/insert/update/delete; anon không có quyền gì.
+- **Kết quả:** PR `feat/15-meal-data`.
