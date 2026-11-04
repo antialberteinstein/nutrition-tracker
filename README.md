@@ -40,7 +40,7 @@ npm start                     # Metro / Expo dev server
   - dev và test dùng bản local (`npx supabase start`); dữ liệu thật nằm trên một project cloud (ADR-011);
   - biến public trong client: `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`;
   - service role key **chỉ** nằm trong biến môi trường của Edge Function.
-- **Migration:** chỉ qua file trong `supabase/migrations/`, áp dụng lên cloud bằng `npx supabase db push` sau khi PR đã merge. Không sửa schema trên dashboard.
+- **Migration:** chỉ qua file trong `supabase/migrations/`, áp dụng lên cloud bằng `npx supabase db push --remote` sau khi PR đã merge. Không sửa schema trên dashboard.
 - **Thông báo:** lên lịch cục bộ bằng `expo-notifications`, chưa dùng Firebase (ADR-006, ADR-007).
 
 ## Kiểm tra

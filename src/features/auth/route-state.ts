@@ -17,10 +17,13 @@ export type Guards = {
   tabs: boolean;
 };
 
+/** The one screen each ready state leaves open; guarded routes redirect here. */
+export type Destination = "/login" | "/reset-password" | "/onboarding" | "/";
+
 export type RouteState =
   | { kind: "loading" }
   | { kind: "profile-error" }
-  | { kind: "ready"; guards: Guards };
+  | { kind: "ready"; guards: Guards; redirect: Destination };
 
 const none: Guards = {
   auth: false,
@@ -43,13 +46,23 @@ export function routeState({
 }: RouteInput): RouteState {
   if (initializing) return { kind: "loading" };
   if (!signedIn)
-    return { kind: "ready", guards: { ...none, auth: true, callback: true } };
-  if (recovering) return { kind: "ready", guards: { ...none, recovery: true } };
+    return {
+      kind: "ready",
+      guards: { ...none, auth: true, callback: true },
+      redirect: "/login",
+    };
+  if (recovering)
+    return {
+      kind: "ready",
+      guards: { ...none, recovery: true },
+      redirect: "/reset-password",
+    };
   if (profile === "pending") return { kind: "loading" };
   if (profile === "error") return { kind: "profile-error" };
   return {
     kind: "ready",
     guards: { ...none, onboarding: profile === "no", tabs: profile === "yes" },
+    redirect: profile === "no" ? "/onboarding" : "/",
   };
 }
 

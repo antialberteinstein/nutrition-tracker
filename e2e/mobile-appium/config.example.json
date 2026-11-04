@@ -4,5 +4,6 @@
   "apkPath": "build/app-debug.apk",
   "appPackage": "io.github.antialberteinstein.nutritiontracker",
   "testEmail": "REPLACE_WITH_CLOUD_TEST_ACCOUNT_EMAIL",
-  "testPassword": "REPLACE_WITH_CLOUD_TEST_ACCOUNT_PASSWORD"
+  "testPassword": "REPLACE_WITH_CLOUD_TEST_ACCOUNT_PASSWORD",
+  "signupEmail": "REPLACE_WITH_DELIVERABLE_ADDRESS+e2e-{ts}@example.com"
 }

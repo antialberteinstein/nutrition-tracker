@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { AppState } from "react-native";
+import { AppState, LogBox } from "react-native";
 
 import { parseSupabaseEnv } from "@/lib/env";
 import { LargeSecureStore } from "@/lib/large-secure-store";
@@ -19,6 +19,11 @@ export const supabase = createClient(url, anonKey, {
     flowType: "pkce",
   },
 });
+
+// Without WebCrypto (Hermes), supabase-js warns once per PKCE flow and falls back to the "plain"
+// code challenge. Hide only that dev-mode toast: it sat on top of the bottom buttons (onboarding
+// "Đăng xuất") and swallowed taps in E2E. Moving PKCE to S256 is tracked separately.
+LogBox.ignoreLogs(["WebCrypto API is not supported"]);
 
 // Refresh the session only while the app is in the foreground (Supabase React Native guidance).
 AppState.addEventListener("change", (state) => {

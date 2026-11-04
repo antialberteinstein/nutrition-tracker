@@ -18,11 +18,14 @@ from pathlib import Path
 import pytest
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
+from appium.webdriver.common.appiumby import AppiumBy
+from selenium.webdriver.support.ui import WebDriverWait
 
 E2E_DIR = Path(__file__).resolve().parent
 REPO_ROOT = E2E_DIR.parent.parent
 CONFIG_PATH = Path(os.environ.get("E2E_CONFIG", E2E_DIR / "config.json"))
 REPORTS_DIR = Path(os.environ.get("E2E_REPORTS_DIR", REPO_ROOT / "reports"))
+STARTUP_TIMEOUT = 90  # seconds for the first screen after install (bundle download included)
 
 
 def load_config() -> dict:
@@ -57,6 +60,14 @@ def driver(config: dict):
     options.new_command_timeout = 120
 
     session = webdriver.Remote(config["appiumServer"], options=options)
+    # React Native sets testID as a bare resource-id ("screen-login"); without this, UiAutomator2
+    # rewrites AppiumBy.ID lookups to "<appPackage>:id/screen-login" and never finds them.
+    session.update_settings({"disableIdLocatorAutocompletion": True})
+    # Cold start: the debug APK downloads the JS bundle from Metro (over Wi-Fi when adb is wireless),
+    # which can take longer than the implicit wait. Wait once for the first app screen (testID screen-*).
+    WebDriverWait(session, STARTUP_TIMEOUT, poll_frequency=1).until(
+        lambda d: d.find_elements(AppiumBy.XPATH, '//*[starts-with(@resource-id, "screen-")]')
+    )
     session.implicitly_wait(10)
     yield session
     session.quit()
