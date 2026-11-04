@@ -6,6 +6,9 @@ Mọi thay đổi đáng chú ý của Nutrition Tracker được ghi tại đâ
 
 ## [Unreleased]
 
+### Thêm
+- Nền app: client Supabase với phiên được mã hoá (khoá trong SecureStore), TanStack Query (mutation không tự retry), seed hai tài khoản E2E cho Supabase local ([#8](https://github.com/antialberteinstein/nutrition-tracker/issues/8)).
+
 ### Bảo trì
 - Khung repo: Expo SDK 58 (TypeScript, Expo Router, 3 tab Hôm nay · Biểu đồ · Cài đặt chưa có tính năng), Supabase local với test RLS, Jest, ESLint/Prettier, E2E Appium (Python/uv) cùng các script build APK, Metro và chạy test, CI, Dependabot.
 

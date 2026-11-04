@@ -110,3 +110,11 @@ Mẫu một mục:
   - Bỏ "mở PR" khỏi danh sách phải hỏi.
   - Xung đột trên spec đã duyệt hoặc ADR "Chấp nhận" mà không gộp được bằng cách giữ cả hai phía thì vẫn dừng lại hỏi (bước 5, mục "Review và merge PR" trong CLAUDE.md).
 - **Kết quả:** PR `docs/claude-pr-no-ask`.
+
+## 2026-11-04 · `/kessie-skills:proj build #7 -> #15` — #8 Nền app
+- **Yêu cầu:** Issue #8: Supabase client, biến môi trường, TanStack Query, lưu phiên an toàn, seed tài khoản E2E.
+- **Quyết định:**
+  - Lưu phiên bằng `LargeSecureStore` theo hướng dẫn Expo của Supabase: khoá AES-256 trong SecureStore, phiên đã mã hoá trong AsyncStorage.
+  - Auto-refresh token chỉ chạy khi app ở foreground.
+  - CI thêm bước `supabase db reset` để nạp seed; có test pgTAP kiểm tra seed.
+- **Kết quả:** PR `feat/8-app-foundation`.

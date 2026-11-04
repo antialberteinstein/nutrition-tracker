@@ -64,6 +64,8 @@ scripts/run-test.sh          # E2E Appium trên thiết bị Android thật
 | `build` | JS bundle được cho Android | APK chạy được trên máy |
 | E2E Appium | Luồng chính chạy trên một thiết bị thật cụ thể | Mọi model máy, thông báo đúng giờ, chế độ tiết kiệm pin |
 
+E2E dùng Supabase local: `npx supabase db reset` nạp `supabase/seed.sql`, tạo hai tài khoản đã xác nhận email là `e2e-a@test.local` và `e2e-b@test.local`, cùng mật khẩu giả `E2e-local-only-1` (chỉ dùng ở local). Chép `.env.example` thành `.env.e2e` (đã gitignore) và điền URL cùng anon key lấy từ `npx supabase status`; `scripts/run-metro.sh` sẽ nạp file này.
+
 E2E cần `e2e/mobile-appium/config.json`: chép từ `config.example.json` và điền UDID của máy test (file này không commit). Báo cáo nằm trong `reports/`, mỗi lần chạy ghi đè lần trước. Chi tiết ở [docs/testing/test-plan.md](docs/testing/test-plan.md).
 
 ## Cấu trúc
