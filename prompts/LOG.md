@@ -78,3 +78,8 @@ Mẫu một mục:
   - `eslint.config.js` do `expo lint` sinh; Prettier dùng cấu hình mặc định (hook config-protection chặn tạo file cấu hình riêng).
   - Supabase CLI là devDependency (`npx supabase`).
 - **Kết quả:** commit `chore: scaffold repository foundation`.
+
+## 2026-11-04 · Xác nhận sau giai đoạn 3
+- **Yêu cầu:** Push 2 commit đầu lên GitHub; bật bảo vệ `main` khi CI xanh; thêm plugin chính chủ của Expo vào bảng "Skill bổ trợ".
+- **Quyết định:** Thêm `expo@claude-plugins-official` vào bảng (chỉ gợi ý lệnh cài, không tự cài). Bảo vệ `main`: bắt buộc PR và hai check CI, cấm force-push, không bắt buộc reviewer.
+- **Kết quả:** PR `docs/claude-expo-skill`.

@@ -119,6 +119,7 @@ npx expo install <pkg>   # luôn dùng thay cho npm install để có phiên b�
 | Skill | Vai trò | Lệnh cài (Claude Code) |
 |---|---|---|
 | `karpathy-guidelines` ([multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)) | Nghĩ trước khi code · đơn giản trước · sửa đúng chỗ · định nghĩa "xong" bằng tiêu chí kiểm chứng được. Luôn áp dụng | `/plugin install andrej-karpathy-skills --marketplace multica-ai/andrej-karpathy-skills` |
+| `expo` (plugin chính chủ, marketplace `claude-plugins-official`) | Hướng dẫn agent dùng đúng API theo phiên bản Expo SDK (SDK 58), EAS, Expo Router. Áp dụng mọi khi đụng tới API của Expo hoặc React Native | `/plugin install expo@claude-plugins-official` |
 
 - **Đầu mỗi phiên**, kiểm tra từng skill trong bảng có nằm trong danh sách skill khả dụng của agent không. Thiếu skill nào thì **gợi ý** người dùng lệnh cài ở cột cuối, một lần mỗi phiên. **Không tự cài**, không sửa settings của người dùng.
 - Khi skill chưa được cài, vẫn làm theo nguyên tắc ở cột "Vai trò".
