@@ -110,3 +110,12 @@ Mẫu một mục:
   - Bỏ "mở PR" khỏi danh sách phải hỏi.
   - Xung đột trên spec đã duyệt hoặc ADR "Chấp nhận" mà không gộp được bằng cách giữ cả hai phía thì vẫn dừng lại hỏi (bước 5, mục "Review và merge PR" trong CLAUDE.md).
 - **Kết quả:** PR `docs/claude-pr-no-ask`.
+
+## 2026-11-04 · `/kessie-skills:proj build #7 -> #15` — #7 Dependabot
+- **Yêu cầu:** Làm lần lượt các issue từ #7 tới #15. Issue #7: chặn Dependabot nâng lệch phiên bản mà Expo SDK ghim, và xử lý các PR #1–#5.
+- **Quyết định:**
+  - Đã merge #1 và #2 (actions v7, CI xanh).
+  - Đóng #3, vì `npx expo install --check` báo bộ phiên bản hiện tại đã đúng SDK 58.
+  - Đóng #4 (ESLint 10) và #5 (TypeScript 7), vì làm đỏ CI và SDK chưa hỗ trợ.
+  - Dependabot: bỏ qua mọi bản nâng của React/React Native do SDK ghim; với `expo*` chỉ nhận bản patch; TypeScript và ESLint bỏ qua bản major.
+- **Kết quả:** PR #27.
