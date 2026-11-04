@@ -119,3 +119,11 @@ Mẫu một mục:
   - Đóng #4 (ESLint 10) và #5 (TypeScript 7), vì làm đỏ CI và SDK chưa hỗ trợ.
   - Dependabot: bỏ qua mọi bản nâng của React/React Native do SDK ghim; với `expo*` chỉ nhận bản patch; TypeScript và ESLint bỏ qua bản major.
 - **Kết quả:** PR #27.
+
+## 2026-11-04 · `/kessie-skills:proj build #7 -> #15` — #8 Nền app
+- **Yêu cầu:** Issue #8: Supabase client, biến môi trường, TanStack Query, lưu phiên an toàn, seed tài khoản E2E.
+- **Quyết định:**
+  - Lưu phiên bằng `LargeSecureStore` theo hướng dẫn Expo của Supabase: khoá AES-256 trong SecureStore, phiên đã mã hoá trong AsyncStorage.
+  - Auto-refresh token chỉ chạy khi app ở foreground.
+  - CI thêm bước `supabase db reset` để nạp seed; có test pgTAP kiểm tra seed.
+- **Kết quả:** PR `feat/8-app-foundation`.
